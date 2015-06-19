@@ -82,6 +82,8 @@
             $('#use').click(function(e) {
                 e.preventDefault();
 
+                $result.empty();
+
                 getGeoposition({
                     before: function() {
                         report("Start retrieving position...");
