@@ -9,7 +9,7 @@
 <body>
     <div class="container" style="padding-top: 10px;">
         <div class="form-group">
-            <a href="#" id="use" class="btn btn-default">Use Geolocation API</a>
+            <a href="#" id="use" class="btn btn-default">Get location</a>
         </div>
 
         <div id="result" class="alert alert-info">
@@ -19,57 +19,9 @@
 
     <script src="http://code.jquery.com/jquery-2.1.4.min.js" type="text/javascript"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="/script.js" type="text/javascript"></script>
 
     <script type="text/javascript">
-        var getGeoposition = (function() {
-            var defaults = {
-                options: {},
-                before: function() {},
-                success: function() {},
-                error: function() {},
-                complete: function() {},
-                onUnavailable: function() {}
-            };
-
-            /**
-             * Get Geoposition
-             *
-             * @param {Object} options
-             *  - options: {Object} Options for navigator.geolocation.getCurrentPosition
-             *  - before: {Function} Before requesting permission and/or making request
-             *  - success: {Function} Success callback. Takes Geoposition object as argument
-             *  - error: {Function} Error callback. Takes PositionError object as argument
-             *  - complete: {Function} Complete callback
-             *  - onUnavailable: {Function} When navigator.geolocation property is unavailable
-             */
-            return function getGeoposition(options) {
-                var settings = $.extend({}, defaults, options),
-                        completed = false;
-
-                function complete() {
-                    if (!completed) {
-                        completed = true;
-
-                        settings.complete.apply(this);
-                    }
-                }
-
-                if (navigator.geolocation) {
-                    settings.before();
-
-                    navigator.geolocation.getCurrentPosition(function() {
-                        settings.success.apply(this, arguments);
-                        complete();
-                    }, function() {
-                        settings.error.apply(this, arguments);
-                        complete();
-                    }, settings.options);
-                } else {
-                    settings.onUnavailable();
-                }
-            };
-        })();
-
         $(function() {
             var $result = $('#result');
 
