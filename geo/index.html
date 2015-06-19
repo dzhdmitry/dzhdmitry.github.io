@@ -74,7 +74,9 @@
             var $result = $('#result');
 
             function report(text) {
-                var message = "<div>" + text + "</div>";
+                var now = new Date(),
+                    nowStr = now.toLocaleString("en-US"),
+                    message = "<div>[" + nowStr + "] " + text + "</div>";
 
                 $result.append(message);
             }
