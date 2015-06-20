@@ -21,8 +21,6 @@ body {
   background-size: contain;
   width: 2em;
   height: 3vh;
-}
-.fb-arrow-right:not(:first-child) {
   margin-left: 0.5em;
 }
 .btn-transparent {
@@ -37,8 +35,8 @@ body {
 }
 .btn-social {
   display: inline-block;
-  width: 2em;
-  height: 2em;
+  width: 3em;
+  height: 3em;
 }
 .btn-facebook {
   background: url("img/icon_fb.png") no-repeat;
