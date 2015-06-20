@@ -73,7 +73,7 @@ p {
   border: 0;
 }
 .container {
-  max-width: 600px;
+  width: 100%;
 }
 .form-control {
   height: 3em;
@@ -85,10 +85,11 @@ p {
 }
 .navbar-brand {
   background: url("img/fb_logo_line.png") no-repeat;
-  display: block;
-  width: 200px;
-  padding: 0;
   background-size: contain;
+  display: block;
+  padding: 0;
+  width: 10em;
+  height: 9.5vh;
   float: none;
   margin-left: auto;
   margin-right: auto;
