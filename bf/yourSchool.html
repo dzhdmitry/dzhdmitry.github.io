@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Your School</title>
+    <link href="http://fonts.googleapis.com/css?family=Oxygen:400,300,700" rel="stylesheet" type="text/css">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div id="wrapper">
+    <div class="container nav-container">
+        <nav class="navbar navbar-default">
+            <a href="#" class="navbar-brand"></a>
+        </nav>
+    </div>
+
+    <div class="container">
+        <div style="margin-top: 1em;">
+            <a href="#" class="btn-user">Jane</a>
+
+            <a href="#" class="btn-signOut pull-right">
+                Sign Out
+                <span class="fb-arrow fb-arrow-green"></span>
+            </a>
+        </div>
+
+        <h1>Your School</h1>
+
+        <form class="form-horizontal">
+            <div class="form-group">
+                <div class="col-sm-12">
+                    <select class="form-control">
+                        <option selected>Your School</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="fb-control-label col-sm-4">Water fountains</label>
+
+                <div class="col-sm-8">
+                    <label class="fb-control-label">
+                        <input type="radio" name="fountains" checked> Yes
+                    </label>
+
+                    <label class="fb-control-label">
+                        <input type="radio" name="fountains"> No
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="form-fountains" class="fb-control-label col-sm-4">How many?</label>
+
+                <div class="col-sm-8">
+                    <input type="number" id="form-fountains" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="fb-control-label col-sm-4">School garden available?</label>
+
+                <div class="col-sm-8">
+                    <label class="fb-control-label">
+                        <input type="radio" name="garden" checked> Yes
+                    </label>
+
+                    <label class="fb-control-label">
+                        <input type="radio" name="garden"> No
+                    </label>
+                </div>
+            </div>
+
+            <hr>
+
+            <h4>School has:</h4>
+
+            <div class="form-group">
+                <label class="fb-control-label col-sm-4">Vending machine</label>
+
+                <div class="col-sm-8">
+                    <label class="fb-control-label">
+                        <input type="radio" name="machine" checked> Yes
+                    </label>
+
+                    <label class="fb-control-label">
+                        <input type="radio" name="machine"> No
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="fb-control-label col-sm-4">Canteen</label>
+
+                <div class="col-sm-8">
+                    <label class="fb-control-label">
+                        <input type="radio" name="Canteen" checked> Yes
+                    </label>
+
+                    <label class="fb-control-label">
+                        <input type="radio" name="Canteen"> No
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="fb-control-label col-sm-4">Lunch Order System</label>
+
+                <div class="col-sm-8">
+                    <label class="fb-control-label">
+                        <input type="radio" name="Lunch" checked> Yes
+                    </label>
+
+                    <label class="fb-control-label">
+                        <input type="radio" name="Lunch"> No
+                    </label>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="form-group">
+                <div class="col-sm-12">
+                    <button type="submit" class="btn-transparent">Save data <span class="fb-arrow fb-arrow-white"></span></button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -5,8 +5,8 @@
  */
 
 /*!
- * Generated using the Bootstrap Customizer (http://getbootstrap.com/customize/?id=655e1c6f432b8b3eb3b1)
- * Config saved to config.json and https://gist.github.com/655e1c6f432b8b3eb3b1
+ * Generated using the Bootstrap Customizer (http://getbootstrap.com/customize/?id=817480f2c95d01301e98)
+ * Config saved to config.json and https://gist.github.com/817480f2c95d01301e98
  */
 /*!
  * Bootstrap v3.3.5 (http://getbootstrap.com)
@@ -1154,7 +1154,7 @@ hr {
   margin-top: 4vh;
   margin-bottom: 4vh;
   border: 0;
-  border-top: 1px solid #a1bc60;
+  border-top: 1px solid rgba(49, 125, 75, 0.75);
 }
 .sr-only {
   position: absolute;

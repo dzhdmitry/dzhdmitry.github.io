@@ -15,17 +15,26 @@ body {
   background-size: 300px 300px;
   background: url("img/fb_logo_transparent.png") no-repeat right bottom;
 }
-.fb-arrow-right {
+.fb-arrow {
   display: inline-block;
-  background: url("img/icon_arrow_right.png") no-repeat;
-  background-size: contain;
   width: 2em;
   height: 3vh;
   margin-left: 0.5em;
 }
+.fb-arrow-white {
+  background: url("img/icon_arrow_right.png") no-repeat;
+  background-size: contain;
+}
+.fb-arrow-green {
+  background: url("img/icon_arrow_right_dark.png") no-repeat;
+  background-size: contain;
+}
 .fb-scrollable {
   height: 50vh;
   overflow-y: scroll;
+}
+.fb-control-label {
+  padding-top: 0.6em;
 }
 .btn-transparent {
   background-color: transparent;
@@ -50,13 +59,23 @@ body {
   background: url("img/icon_tw.png") no-repeat;
   background-size: contain;
 }
+.btn-user {
+  background: url("img/icon_profile.png") no-repeat;
+  background-size: contain;
+  padding-left: 1.5em;
+  height: 1.5em;
+}
+.btn-signOut {
+  color: rgba(49, 125, 75, 0.75);
+  text-transform: capitalize;
+  font-weight: bold;
+}
+.btn-signOut:hover {
+  color: rgba(49, 125, 75, 0.75);
+}
 .nav-container {
   padding-left: 0;
   padding-right: 0;
-}
-h1 {
-  margin-left: 0.7em;
-  margin-right: 0.7em;
 }
 h2 {
   margin-top: 2vh;
@@ -104,6 +123,9 @@ p {
 }
 .panel:last-child {
   margin-bottom: 0;
+}
+.panel-default hr {
+  border-top-color: #a1bc60;
 }
 .tab-pane.fb-pane {
   background-color: #fff;

@@ -1,3 +1,12 @@
+//Global Variables ->
+@colourGreen: rgba(49, 125, 75, 0.75);
+@colourLightGreen: rgb(109, 175, 52);
+
+.makeIcon(@url) {
+    background: url(@url) no-repeat;
+    background-size: contain;
+}
+
 // Global styles ->
 html, body, #wrapper {
     height: 100%;
@@ -17,18 +26,28 @@ body {
     background: url("img/fb_logo_transparent.png") no-repeat right bottom;
 }
 
-.fb-arrow-right {
+.fb-arrow {
     display: inline-block;
-    background: url("img/icon_arrow_right.png") no-repeat;
-    background-size: contain;
     width: 2em;
     height: 3vh;
     margin-left: 0.5em;
 }
 
+.fb-arrow-white {
+    .makeIcon("img/icon_arrow_right.png");
+}
+
+.fb-arrow-green {
+    .makeIcon("img/icon_arrow_right_dark.png");
+}
+
 .fb-scrollable {
     height: 50vh;
     overflow-y: scroll;
+}
+
+.fb-control-label {
+    padding-top: 0.6em;
 }
 
 .btn-transparent {
@@ -50,13 +69,27 @@ body {
 }
 
 .btn-facebook {
-    background: url("img/icon_fb.png") no-repeat;
-    background-size: contain;
+    .makeIcon("img/icon_fb.png");
 }
 
 .btn-twitter {
-    background: url("img/icon_tw.png") no-repeat;
-    background-size: contain;
+    .makeIcon("img/icon_tw.png");
+}
+
+.btn-user {
+    .makeIcon("img/icon_profile.png");
+    padding-left: 1.5em;
+    height: 1.5em;
+}
+
+.btn-signOut {
+    color: @colourGreen;
+    text-transform: capitalize;
+    font-weight: bold;
+
+    &:hover {
+        color: @colourGreen;
+    }
 }
 
 .nav-container {
@@ -65,11 +98,6 @@ body {
 }
 
 // Bootstrap fixes ->
-h1 {
-    margin-left: 0.7em;
-    margin-right: 0.7em;
-}
-
 h2 {
     margin-top: 2vh;
 }
@@ -106,8 +134,7 @@ p {
 }
 
 .navbar-brand {
-    background: url("img/fb_logo_line.png") no-repeat;
-    background-size: contain;
+    .makeIcon("img/fb_logo_line.png");
     display: block;
     padding: 0;
     width: 10em;
@@ -129,16 +156,22 @@ p {
     }
 }
 
+.panel-default {
+    hr {
+        border-top-color: rgb(161, 188, 96);
+    }
+}
+
 .tab-pane {
     &.fb-pane {
         background-color: #fff;
-        color: rgba(49, 125, 75, 0.75);
+        color: @colourGreen;
         padding: 1em;
         box-shadow: inset 0 1px 8px 0 rgba(50, 50, 50, 0.41);
     }
 
     .panel {
-        background-color: rgb(109, 175, 52);
+        background-color: @colourLightGreen;
         color: white;
     }
 }
