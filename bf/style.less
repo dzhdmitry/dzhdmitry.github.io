@@ -26,6 +26,11 @@ body {
     margin-left: 0.5em;
 }
 
+.fb-scrollable {
+    height: 50vh;
+    overflow-y: scroll;
+}
+
 .btn-transparent {
     background-color: transparent;
     border: 0;
@@ -121,5 +126,19 @@ p {
 
     &:last-child {
         margin-bottom: 0;
+    }
+}
+
+.tab-pane {
+    &.fb-pane {
+        background-color: #fff;
+        color: rgba(49, 125, 75, 0.75);
+        padding: 1em;
+        box-shadow: inset 0 1px 8px 0 rgba(50, 50, 50, 0.41);
+    }
+
+    .panel {
+        background-color: rgb(109, 175, 52);
+        color: white;
     }
 }
