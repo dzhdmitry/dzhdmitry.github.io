@@ -5,8 +5,8 @@
  */
 
 /*!
- * Generated using the Bootstrap Customizer (http://getbootstrap.com/customize/?id=817480f2c95d01301e98)
- * Config saved to config.json and https://gist.github.com/817480f2c95d01301e98
+ * Generated using the Bootstrap Customizer (http://getbootstrap.com/customize/?id=0b9fa7e8866320cd66b6)
+ * Config saved to config.json and https://gist.github.com/0b9fa7e8866320cd66b6
  */
 /*!
  * Bootstrap v3.3.5 (http://getbootstrap.com)
@@ -5302,8 +5302,8 @@ a.thumbnail.active {
   display: block;
   padding: 10px 15px;
   margin-bottom: -1px;
-  background-color: #ffffff;
-  border: 1px solid #dddddd;
+  background-color: rgba(49, 125, 75, 0.65);
+  border: 1px solid rgba(49, 125, 75, 0.65);
 }
 .list-group-item:first-child {
   border-top-right-radius: 0px;
@@ -5316,7 +5316,7 @@ a.thumbnail.active {
 }
 a.list-group-item,
 button.list-group-item {
-  color: #555555;
+  color: #ffffff;
 }
 a.list-group-item .list-group-item-heading,
 button.list-group-item .list-group-item-heading {
@@ -5327,8 +5327,8 @@ button.list-group-item:hover,
 a.list-group-item:focus,
 button.list-group-item:focus {
   text-decoration: none;
-  color: #555555;
-  background-color: #f5f5f5;
+  color: #ffffff;
+  background-color: rgba(49, 125, 75, 0.75);
 }
 button.list-group-item {
   width: 100%;

@@ -289,10 +289,10 @@
     "@progress-bar-warning-bg": "@brand-warning",
     "@progress-bar-danger-bg": "@brand-danger",
     "@progress-bar-info-bg": "@brand-info",
-    "@list-group-bg": "#fff",
-    "@list-group-border": "#ddd",
+    "@list-group-bg": "rgba(49, 125, 75, 0.65)",
+    "@list-group-border": "rgba(49, 125, 75, 0.65)",
     "@list-group-border-radius": "@border-radius-base",
-    "@list-group-hover-bg": "#f5f5f5",
+    "@list-group-hover-bg": "rgba(49, 125, 75, 0.75)",
     "@list-group-active-color": "@component-active-color",
     "@list-group-active-bg": "@component-active-bg",
     "@list-group-active-border": "@list-group-active-bg",
@@ -300,7 +300,7 @@
     "@list-group-disabled-color": "@gray-light",
     "@list-group-disabled-bg": "@gray-lighter",
     "@list-group-disabled-text-color": "@list-group-disabled-color",
-    "@list-group-link-color": "#555",
+    "@list-group-link-color": "#fff",
     "@list-group-link-hover-color": "@list-group-link-color",
     "@list-group-link-heading-color": "#333",
     "@panel-bg": "rgba(49, 125, 75, 0.65)",
@@ -430,5 +430,5 @@
     "scrollspy.js",
     "transition.js"
   ],
-  "customizerUrl": "http://getbootstrap.com/customize/?id=817480f2c95d01301e98"
+  "customizerUrl": "http://getbootstrap.com/customize/?id=0b9fa7e8866320cd66b6"
 }

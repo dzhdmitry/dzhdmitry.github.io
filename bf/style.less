@@ -41,6 +41,16 @@ body {
     .makeIcon("img/icon_arrow_right_dark.png");
 }
 
+.fb-arrow-white-sm {
+    display: inline-block;
+    position: relative;
+    top: 0.15em;
+    width: 1em;
+    height: 1em;
+    float: right;
+    .makeIcon("img/icon_arrow_right_small.png");
+}
+
 .fb-scrollable {
     height: 50vh;
     overflow-y: scroll;
@@ -84,7 +94,7 @@ body {
 
 .btn-signOut {
     color: @colourGreen;
-    text-transform: capitalize;
+    text-transform: uppercase;
     font-weight: bold;
 
     &:hover {
@@ -95,6 +105,10 @@ body {
 .nav-container {
     padding-left: 0;
     padding-right: 0;
+}
+
+.user-bar {
+    margin-top: 1em;
 }
 
 // Bootstrap fixes ->
@@ -127,6 +141,11 @@ p {
     height: 3em;
     padding-left: 1em;
     padding-right: 1em;
+}
+
+.list-group-item {
+    border: 0;
+    margin-bottom: 5px;
 }
 
 .navbar {
