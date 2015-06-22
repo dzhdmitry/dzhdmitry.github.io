@@ -5,8 +5,8 @@
  */
 
 /*!
- * Generated using the Bootstrap Customizer (http://getbootstrap.com/customize/?id=0b9fa7e8866320cd66b6)
- * Config saved to config.json and https://gist.github.com/0b9fa7e8866320cd66b6
+ * Generated using the Bootstrap Customizer (http://getbootstrap.com/customize/?id=e5104f1dc3c0c285e80d)
+ * Config saved to config.json and https://gist.github.com/e5104f1dc3c0c285e80d
  */
 /*!
  * Bootstrap v3.3.5 (http://getbootstrap.com)
@@ -2558,7 +2558,7 @@ output {
   display: block;
   width: 100%;
   height: 6.8vh;
-  padding: 0.4em 3em;
+  padding: 0.4em 2.5em;
   font-size: 3vh;
   line-height: 1.42857143;
   color: #555555;
@@ -2747,7 +2747,7 @@ select[multiple].input-sm {
 }
 .input-lg {
   height: 9vh;
-  padding: 0.5em 4em;
+  padding: 0.5em 3em;
   font-size: 4vh;
   line-height: 1.3333333;
   border-radius: 0px;
@@ -2762,7 +2762,7 @@ select[multiple].input-lg {
 }
 .form-group-lg .form-control {
   height: 9vh;
-  padding: 0.5em 4em;
+  padding: 0.5em 3em;
   font-size: 4vh;
   line-height: 1.3333333;
   border-radius: 0px;
@@ -2778,7 +2778,7 @@ select[multiple].input-lg {
 .form-group-lg .form-control-static {
   height: 9vh;
   min-height: 8vh;
-  padding: 1.5em 4em;
+  padding: 1.5em 3em;
   font-size: 4vh;
   line-height: 1.3333333;
 }
@@ -3016,7 +3016,7 @@ select[multiple].input-lg {
   background-image: none;
   border: 1px solid transparent;
   white-space: nowrap;
-  padding: 0.4em 3em;
+  padding: 0.4em 2.5em;
   font-size: 3vh;
   line-height: 1.42857143;
   border-radius: 0px;
@@ -3492,7 +3492,7 @@ fieldset[disabled] .btn-link:focus {
 }
 .btn-lg,
 .btn-group-lg > .btn {
-  padding: 0.5em 4em;
+  padding: 0.5em 3em;
   font-size: 4vh;
   line-height: 1.3333333;
   border-radius: 0px;
@@ -3891,7 +3891,7 @@ tbody.collapse.in {
 .input-group-lg > .input-group-addon,
 .input-group-lg > .input-group-btn > .btn {
   height: 9vh;
-  padding: 0.5em 4em;
+  padding: 0.5em 3em;
   font-size: 4vh;
   line-height: 1.3333333;
   border-radius: 0px;
@@ -3950,7 +3950,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   vertical-align: middle;
 }
 .input-group-addon {
-  padding: 0.4em 3em;
+  padding: 0.4em 2.5em;
   font-size: 3vh;
   font-weight: normal;
   line-height: 1;
@@ -3966,7 +3966,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   border-radius: 0px;
 }
 .input-group-addon.input-lg {
-  padding: 0.5em 4em;
+  padding: 0.5em 3em;
   font-size: 4vh;
   border-radius: 0px;
 }
@@ -4775,7 +4775,7 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
 .pagination > li > span {
   position: relative;
   float: left;
-  padding: 0.4em 3em;
+  padding: 0.4em 2.5em;
   line-height: 1.42857143;
   text-decoration: none;
   color: #ffffff;
@@ -4828,7 +4828,7 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
 }
 .pagination-lg > li > a,
 .pagination-lg > li > span {
-  padding: 0.5em 4em;
+  padding: 0.5em 3em;
   font-size: 4vh;
   line-height: 1.3333333;
 }

@@ -36,7 +36,7 @@ body {
 
 .fb-arrow {
     display: inline-block;
-    background-position-y: center;
+    background-position-y: center !important;
     width: 1em;
     height: 1em;
 
@@ -189,6 +189,10 @@ p {
 
 .container {
     width: 100%;
+
+    &:last-child {
+        margin-bottom: 1em;
+    }
 }
 
 .form-control {

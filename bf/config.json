@@ -39,9 +39,9 @@
     "@icon-font-name": "\"glyphicons-halflings-regular\"",
     "@icon-font-svg-id": "\"glyphicons_halflingsregular\"",
     "@padding-base-vertical": "0.4em",
-    "@padding-base-horizontal": "3em",
+    "@padding-base-horizontal": "2.5em",
     "@padding-large-vertical": "0.5em",
-    "@padding-large-horizontal": "4em",
+    "@padding-large-horizontal": "3em",
     "@padding-small-vertical": "0.3em",
     "@padding-small-horizontal": "2em",
     "@padding-xs-vertical": "0.3em",
@@ -430,5 +430,5 @@
     "scrollspy.js",
     "transition.js"
   ],
-  "customizerUrl": "http://getbootstrap.com/customize/?id=0b9fa7e8866320cd66b6"
+  "customizerUrl": "http://getbootstrap.com/customize/?id=e5104f1dc3c0c285e80d"
 }
