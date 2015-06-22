@@ -51,12 +51,15 @@ body {
 .fb-arrow {
   display: inline-block;
   background-position-y: center !important;
-  width: 1em;
-  height: 1em;
-}
-.fb-arrow.fb-arrow-lg {
   width: 1.5em;
   height: 1.5em;
+  position: relative;
+  top: 0.2em;
+  margin-left: 0.5em;
+}
+.fb-arrow.fb-arrow-lg {
+  position: inherit;
+  margin: 0;
 }
 .fb-arrow-white {
   background: url("img/icon_arrow_right.png") no-repeat;
@@ -260,32 +263,32 @@ p {
 }
 .fixBtn {
   background-color: #fff;
-  color: #255625;
+  color: #555;
 }
 .fixBtn:active,
 .fixBtn:hover,
 .fixBtn:focus {
   background-color: #fff;
-  color: #255625;
+  color: #555;
 }
 .bootstrap-select .btn-default {
   height: 3em;
   background-color: #fff;
-  color: #255625;
+  color: #555;
 }
 .bootstrap-select .btn-default:active,
 .bootstrap-select .btn-default:hover,
 .bootstrap-select .btn-default:focus {
   background-color: #fff;
-  color: #255625;
+  color: #555;
 }
 .bootstrap-select.open .btn-default {
   background-color: #fff;
-  color: #255625;
+  color: #555;
 }
 .bootstrap-select.open .btn-default:active,
 .bootstrap-select.open .btn-default:hover,
 .bootstrap-select.open .btn-default:focus {
   background-color: #fff;
-  color: #255625;
+  color: #555;
 }

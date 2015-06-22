@@ -66,12 +66,15 @@ body {
 .fb-arrow {
     display: inline-block;
     background-position-y: center !important;
-    width: 1em;
-    height: 1em;
+    width: 1.5em;
+    height: 1.5em;
+    position: relative;
+    top: 0.2em;
+    margin-left: 0.5em;
 
     &.fb-arrow-lg {
-        width: 1.5em;
-        height: 1.5em;
+        position: inherit;
+        margin: 0;
     }
 }
 
@@ -318,14 +321,14 @@ p {
     }
 }
 
-// Bootstrap-select fix (color btn-default to white)
+// Bootstrap-select fix (color btn-default to white) ->
 .fixBtn {
     background-color: #fff;
-    color: #255625;
+    color: #555;
 
     &:active, &:hover, &:focus {
         background-color: #fff;
-        color: #255625;
+        color: #555;
     }
 }
 
