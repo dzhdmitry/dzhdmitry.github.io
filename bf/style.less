@@ -1,5 +1,6 @@
 //Global Variables ->
-@colourGreen: rgba(49, 125, 75, 0.75);
+@colourGreen: #446b32;
+@colourGreenTransparent: rgba(49, 125, 75, 0.75);
 @colourLightGreen: rgb(109, 175, 52);
 
 .makeIcon(@url) {
@@ -16,21 +17,33 @@ body {
     background: linear-gradient(to bottom, #a1bc60 0%, #6daf34 100%);
 }
 
-#wrapper {
+.wrapper {
     width: 100%;
+    height: 100%;
     padding: 0;
     margin: 0;
     overflow-y: auto;
     -webkit-background-size: 300px 300px;
     background-size: 300px 300px;
     background: url("img/fb_logo_transparent.png") no-repeat right bottom;
+
+    &.front {
+        -webkit-background-size: 327px 220px;
+        background-size: 327px 220px;
+        background: url("img/apples_bg_s.png") repeat;
+    }
 }
 
 .fb-arrow {
     display: inline-block;
-    width: 2em;
-    height: 3vh;
-    margin-left: 0.5em;
+    background-position-y: center;
+    width: 1em;
+    height: 1em;
+
+    &.fb-arrow-lg {
+        width: 1.5em;
+        height: 1.5em;
+    }
 }
 
 .fb-arrow-white {
@@ -41,7 +54,7 @@ body {
     .makeIcon("img/icon_arrow_right_dark.png");
 }
 
-.fb-arrow-white-sm {
+.fb-menu-right {
     display: inline-block;
     position: relative;
     top: 0.15em;
@@ -58,6 +71,26 @@ body {
 
 .fb-control-label {
     padding-top: 0.6em;
+}
+
+.fb-logo {
+    background-color: #fff;
+    overflow-y: auto;
+
+    > a {
+        display: block;
+        width: 12em;
+        height: 12em;
+        margin: 1.5em auto 1.5em auto;
+        background: url("img/fb_logo.png") no-repeat;
+        background-position-x: center;
+        background-size: contain;
+    }
+}
+
+.btn-bold {
+    text-transform: uppercase;
+    font-weight: bold;
 }
 
 .btn-transparent {
@@ -92,19 +125,40 @@ body {
     height: 1.5em;
 }
 
-.btn-signOut {
-    color: @colourGreen;
-    text-transform: uppercase;
-    font-weight: bold;
+.btn-signIn {
+    display: inline-block;
+    text-align: center;
+    background-color: @colourGreen;
+    .btn-bold();
+    font-size: 1.5em;
+    border-radius: 50%;
+    width: 6em;
+    height: 6em;
+    padding: 1.5em 0;
 
     &:hover {
-        color: @colourGreen;
+        background-color: #2e4822;
+    }
+}
+
+.btn-signOut {
+    color: @colourGreenTransparent;
+    .btn-bold();
+
+    &:hover {
+        color: @colourGreenTransparent;
     }
 }
 
 .nav-container {
     padding-left: 0;
     padding-right: 0;
+}
+
+.signIn-block {
+    text-align: right;
+    padding-top: 3em;
+    padding-right: 3em;
 }
 
 .user-bar {
@@ -184,7 +238,7 @@ p {
 .tab-pane {
     &.fb-pane {
         background-color: #fff;
-        color: @colourGreen;
+        color: @colourGreenTransparent;
         padding: 1em;
         box-shadow: inset 0 1px 8px 0 rgba(50, 50, 50, 0.41);
     }
