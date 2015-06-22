@@ -5,6 +5,7 @@
     <title>Your School</title>
     <link href="http://fonts.googleapis.com/css?family=Oxygen:400,300,700" rel="stylesheet" type="text/css">
     <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="bootstrap-select.min.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
 </head>
 
@@ -120,6 +121,22 @@
                 </div>
             </div>
 
+            <h4>Select the foods available:</h4>
+
+            <div class="form-group">
+                <div class="col-sm-12">
+                    <select id="school_vendingMachinesFoods" name="school[vendingMachinesFoods][]" class="selectpicker form-control" data-none-selected-text="Vending machines" data-size="10" data-max-options="12" data-selected-text-format="count&gt;3" multiple="multiple">
+                        <option value="SUGARY_DRINKS">Sugary fizzy drinks (lemonade, cola)</option>
+                        <option value="FRUIT_JUICES">Fruit juices</option>
+                        <option value="SWEETENED">Artificially sweetened fruit/vegetable juice and drinks</option>
+                        <option value="TEA_COFFEE">Tea, Coffee</option>
+                        <option value="CHOCOLATE_MILO">Hot Chocolate, Milo</option>
+                        <option value="ENERGY">Energy drinks</option>
+                        <option value="WATER">Flavoured and/or fortified water</option>
+                    </select>
+                </div>
+            </div>
+
             <hr>
 
             <div class="form-group">
@@ -133,5 +150,13 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
+<script src="bootstrap-select.min.js"></script>
+
+<script type="text/javascript">
+    $(function() {
+        //
+    });
+</script>
+
 </body>
 </html>

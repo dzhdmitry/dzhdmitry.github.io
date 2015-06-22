@@ -17,27 +17,33 @@ body {
     background: linear-gradient(to bottom, #a1bc60 0%, #6daf34 100%);
 }
 
+.fb-icon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+}
+
+.fb-icon-data {
+    .makeIcon("img/icon_apple.png");
+}
+
+.fb-icon-results {
+    .makeIcon("img/icon_see_results.png");
+}
+
+.fb-icon-pinboard {
+    .makeIcon("img/icon_pinboard.png");
+}
+
+.fb-icon-profile {
+    .makeIcon("img/icon_profile.png");
+}
+
 .contribute-icon {
     display: block;
     margin: 0 auto 1em auto;
     width: 2em;
     height: 2em;
-
-    &.contribute-icon-data {
-        .makeIcon("img/icon_apple.png");
-    }
-
-    &.contribute-icon-results {
-        .makeIcon("img/icon_see_results.png");
-    }
-
-    &.contribute-icon-pinboard {
-        .makeIcon("img/icon_pinboard.png");
-    }
-
-    &.contribute-icon-profile {
-        .makeIcon("img/icon_profile.png");
-    }
 }
 
 .wrapper {
@@ -152,7 +158,7 @@ body {
     display: inline-block;
     text-align: center;
     background-color: @colourGreen;
-    .btn-bold();
+    .btn-bold;
     font-size: 1.5em;
     border-radius: 50%;
     width: 6em;
@@ -166,10 +172,28 @@ body {
 
 .btn-signOut {
     color: @colourGreenTransparent;
-    .btn-bold();
+    .btn-bold;
 
     &:hover {
         color: @colourGreenTransparent;
+    }
+}
+
+.inline-list {
+    list-style: none inside;
+    padding-left: 0;
+
+    > li {
+        display: inline-block;
+
+        &:not(:last-child) {
+            border-right: 1px solid #fff;
+        }
+
+        > a {
+            display: inline-block;
+            padding: 0.2em 0.8em;
+        }
     }
 }
 
@@ -291,5 +315,29 @@ p {
     .panel {
         background-color: @colourLightGreen;
         color: white;
+    }
+}
+
+// Bootstrap-select fix (color btn-default to white)
+.fixBtn {
+    background-color: #fff;
+    color: #255625;
+
+    &:active, &:hover, &:focus {
+        background-color: #fff;
+        color: #255625;
+    }
+}
+
+.bootstrap-select {
+    .btn-default {
+        height: 3em;
+        .fixBtn;
+    }
+
+    &.open {
+        .btn-default {
+            .fixBtn;
+        }
     }
 }

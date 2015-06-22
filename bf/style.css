@@ -6,27 +6,32 @@ body,
 body {
   background: linear-gradient(to bottom, #a1bc60 0%, #6daf34 100%);
 }
+.fb-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+}
+.fb-icon-data {
+  background: url("img/icon_apple.png") no-repeat;
+  background-size: contain;
+}
+.fb-icon-results {
+  background: url("img/icon_see_results.png") no-repeat;
+  background-size: contain;
+}
+.fb-icon-pinboard {
+  background: url("img/icon_pinboard.png") no-repeat;
+  background-size: contain;
+}
+.fb-icon-profile {
+  background: url("img/icon_profile.png") no-repeat;
+  background-size: contain;
+}
 .contribute-icon {
   display: block;
   margin: 0 auto 1em auto;
   width: 2em;
   height: 2em;
-}
-.contribute-icon.contribute-icon-data {
-  background: url("img/icon_apple.png") no-repeat;
-  background-size: contain;
-}
-.contribute-icon.contribute-icon-results {
-  background: url("img/icon_see_results.png") no-repeat;
-  background-size: contain;
-}
-.contribute-icon.contribute-icon-pinboard {
-  background: url("img/icon_pinboard.png") no-repeat;
-  background-size: contain;
-}
-.contribute-icon.contribute-icon-profile {
-  background: url("img/icon_profile.png") no-repeat;
-  background-size: contain;
 }
 .wrapper {
   width: 100%;
@@ -147,6 +152,20 @@ body {
 .btn-signOut:hover {
   color: rgba(49, 125, 75, 0.75);
 }
+.inline-list {
+  list-style: none inside;
+  padding-left: 0;
+}
+.inline-list > li {
+  display: inline-block;
+}
+.inline-list > li:not(:last-child) {
+  border-right: 1px solid #fff;
+}
+.inline-list > li > a {
+  display: inline-block;
+  padding: 0.2em 0.8em;
+}
 .nav-container {
   padding-left: 0;
   padding-right: 0;
@@ -238,4 +257,35 @@ p {
 .tab-pane .panel {
   background-color: #6daf34;
   color: white;
+}
+.fixBtn {
+  background-color: #fff;
+  color: #255625;
+}
+.fixBtn:active,
+.fixBtn:hover,
+.fixBtn:focus {
+  background-color: #fff;
+  color: #255625;
+}
+.bootstrap-select .btn-default {
+  height: 3em;
+  background-color: #fff;
+  color: #255625;
+}
+.bootstrap-select .btn-default:active,
+.bootstrap-select .btn-default:hover,
+.bootstrap-select .btn-default:focus {
+  background-color: #fff;
+  color: #255625;
+}
+.bootstrap-select.open .btn-default {
+  background-color: #fff;
+  color: #255625;
+}
+.bootstrap-select.open .btn-default:active,
+.bootstrap-select.open .btn-default:hover,
+.bootstrap-select.open .btn-default:focus {
+  background-color: #fff;
+  color: #255625;
 }
