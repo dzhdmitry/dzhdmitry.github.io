@@ -6,6 +6,28 @@ body,
 body {
   background: linear-gradient(to bottom, #a1bc60 0%, #6daf34 100%);
 }
+.contribute-icon {
+  display: block;
+  margin: 0 auto 1em auto;
+  width: 2em;
+  height: 2em;
+}
+.contribute-icon.contribute-icon-data {
+  background: url("img/icon_apple.png") no-repeat;
+  background-size: contain;
+}
+.contribute-icon.contribute-icon-results {
+  background: url("img/icon_see_results.png") no-repeat;
+  background-size: contain;
+}
+.contribute-icon.contribute-icon-pinboard {
+  background: url("img/icon_pinboard.png") no-repeat;
+  background-size: contain;
+}
+.contribute-icon.contribute-icon-profile {
+  background: url("img/icon_profile.png") no-repeat;
+  background-size: contain;
+}
 .wrapper {
   width: 100%;
   height: 100%;
@@ -158,6 +180,19 @@ p {
 }
 .container:last-child {
   margin-bottom: 1em;
+}
+.container.container-contribute > .row {
+  margin-left: -5px;
+  margin-right: -5px;
+}
+.container.container-contribute .col-xs-6 {
+  padding-left: 5px;
+  padding-right: 5px;
+  margin-bottom: 10px;
+}
+.container.container-contribute .btn-block {
+  padding-top: 3em;
+  padding-bottom: 3em;
 }
 .form-control {
   height: 3em;
