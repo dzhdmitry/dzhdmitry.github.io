@@ -1,0 +1,26 @@
+.drop-zone-container {
+    display: table;
+}
+
+.drop-zone {
+    display: table-cell;
+    vertical-align: middle;
+    width: 200px;
+    height: 200px;
+    border: 2px dashed #333;
+    border-radius: 50%;
+    text-align: center;
+    color: #333;
+    cursor: pointer;
+}
+
+.drop-zone.drag-over, .drop-zone:hover, .drop-zone:active {
+    border-color: lightslategray;
+    color: lightslategray;
+}
+
+.drop-zone > span {
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+}
