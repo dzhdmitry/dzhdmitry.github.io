@@ -10,15 +10,24 @@
 <body>
 <div class="container">
     <form>
-        <div class="form-group visible-lg">
+        <div class="form-group visible-lg text-center">
             <label for="documentFile" class="btn btn-default">Browse file</label>
         </div>
 
-        <div class="form-group drop-zone-container">
-            <label for="documentFile" id="documentFileZone" class="drop-zone">
-                <span class="visible-lg">or drop document here</span>
-                <span class="hidden-lg">Add document</span>
-            </label>
+        <div class="form-group visible-lg">
+            <div class="drop-zone-container">
+                <div class="drop-zone">
+                    <span>or drop document here</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group hidden-lg">
+            <div class="drop-zone-container">
+                <label for="documentFile" class="drop-zone">
+                    <span>Add document</span>
+                </label>
+            </div>
         </div>
 
         <div class="form-group">
@@ -28,6 +37,7 @@
         <input type="file" name="documentFile" id="documentFile" class="hide">
     </form>
 </div>
+
 <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
@@ -52,23 +62,22 @@
 
 <script>
     $(function() {
-        var $area = $('#documentFileZone'),
-            $file = $('#documentFile'),
+        var $file = $('#documentFile'),
             status = new Status($('#status')),
             renderFiles = _.template($('#files-template').html());
 
-        $area.dragZone({
+        $('.drop-zone').dragZone({
             onUnsupported: function() {
                 status.update("Drag and drop is not supported");
             },
             onDragOver: function() {
-                $area.addClass("drag-over");
+                this.addClass("drag-over");
             },
             onDragLeave: function() {
-                $area.removeClass("drag-over");
+                this.removeClass("drag-over");
             },
             onDrop: function(e) {
-                $area.removeClass("drag-over");
+                this.removeClass("drag-over");
 
                 if (e.dataTransfer.files.length) {
                     $file.get(0).files = e.dataTransfer.files;

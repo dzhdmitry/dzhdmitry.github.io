@@ -1,9 +1,8 @@
 (function($) {
     /**
      * Drop zone file upload
-     * this must be an input[type=file]
      *
-     * @param {{zone, onUnsupported, onDragOver, onDragLeave, onDrop}} options
+     * @param {{onUnsupported, onDragOver, onDragLeave, onDrop}} options
      * @returns {jQuery}
      */
     $.fn.dragZone = function(options) {
@@ -44,6 +43,12 @@
     }
 })(jQuery);
 
+/**
+ * Status alert handler
+ *
+ * @param {jQuery} $el
+ * @constructor
+ */
 var Status = function($el) {
     this.$el = $el;
 
