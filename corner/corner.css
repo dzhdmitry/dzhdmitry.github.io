@@ -1,0 +1,38 @@
+body {
+  padding-top: 15px;
+}
+.item-container {
+  list-style: none;
+  padding: 10px;
+  background-color: #48494e;
+  font-weight: bold;
+}
+.item {
+  padding: 10px;
+  color: white;
+  margin-bottom: 10px;
+}
+.item.item-green {
+  background-color: #81b93f;
+}
+.item.item-red {
+  background-color: #f44336;
+}
+.item.item-yellow {
+  background-color: #f1c100;
+}
+.corner-wrapped {
+  position: relative;
+  overflow-y: hidden;
+}
+.corner-wrapped:before {
+  content: "";
+  border-width: 0 10px 20px 0;
+  border-color: rgba(0, 0, 0, 0.2) rgba(0, 0, 0, 0.2) #48494e #48494e;
+  border-style: solid;
+  position: absolute;
+  bottom: -6px;
+  right: 0;
+  width: 20px;
+  transform: rotate(-90deg) skewX(20deg);
+}
