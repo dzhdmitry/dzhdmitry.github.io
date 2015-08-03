@@ -5,7 +5,7 @@
      * @param {{onUnsupported, onDragOver, onDragLeave, onDrop}} options
      * @returns {jQuery}
      */
-    $.fn.dragZone = function(options) {
+    $.fn.dropZone = function(options) {
         var settings = $.extend({
             onUnsupported: function() {},
             onDragOver: function() {},

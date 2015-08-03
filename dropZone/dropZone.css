@@ -11,10 +11,10 @@ body {
   vertical-align: middle;
   width: 200px;
   height: 200px;
-  border: 2px dashed #333;
+  border: 2px dashed #333333;
   border-radius: 50%;
   text-align: center;
-  color: #333;
+  color: #333333;
 }
 .drop-zone.drag-over {
   border-color: lightslategray;
@@ -28,7 +28,8 @@ label.drop-zone {
   cursor: pointer;
 }
 label.drop-zone:hover,
-label.drop-zone:active {
+label.drop-zone:active,
+label.drop-zone:focus {
   border-color: lightslategray;
   color: lightslategray;
 }

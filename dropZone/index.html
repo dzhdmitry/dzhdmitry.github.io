@@ -52,7 +52,14 @@
     <ul>
         <% _.each(files, function(file) { %>
             <li>
-                <b><%= file.type %></b>
+                <b>
+                    <% if (file.type) { %>
+                        <%= file.type %>
+                    <% } else { %>
+                        &lt;Unknown type&gt;
+                    <% } %>
+                </b>
+
                 <%= file.name %>
             </li>
         <% }); %>
@@ -66,7 +73,7 @@
             status = new Status($('#status')),
             renderFiles = _.template($('#files-template').html());
 
-        $('.drop-zone').dragZone({
+        $('.drop-zone').dropZone({
             onUnsupported: function() {
                 status.update("Drag and drop is not supported");
             },

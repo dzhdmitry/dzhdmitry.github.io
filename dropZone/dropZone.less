@@ -1,10 +1,12 @@
-.zoneHover() {
-    border-color: lightslategray;
-    color: lightslategray;
-}
+@import "../common";
 
-body {
-    padding-top: 15px;
+@zoneSize: 200px;
+@zoneColor: #333;
+@zoneActiveColor: lightslategray;
+
+.zoneActive() {
+    border-color: @zoneActiveColor;
+    color: @zoneActiveColor;
 }
 
 .drop-zone-container {
@@ -16,15 +18,15 @@ body {
 .drop-zone {
     display: table-cell;
     vertical-align: middle;
-    width: 200px;
-    height: 200px;
-    border: 2px dashed #333;
+    width: @zoneSize;
+    height: @zoneSize;
+    border: 2px dashed @zoneColor;
     border-radius: 50%;
     text-align: center;
-    color: #333;
+    color: @zoneColor;
 
     &.drag-over {
-        .zoneHover();
+        .zoneActive();
     }
 
     > span {
@@ -36,7 +38,7 @@ body {
 label.drop-zone {
     cursor: pointer;
 
-    &:hover, &:active {
-        .zoneHover();
+    &:hover, &:active, &:focus {
+        .zoneActive();
     }
 }
