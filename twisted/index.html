@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Twisted layout</title>
+    <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <link href="twisted.css" rel="stylesheet">
+
+    <style>
+        .twisted-container-xs, .twisted-container-sm, .twisted-container-md, .twisted-container-lg {
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+
+        .twisted-main, .twisted-side-right {
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .twisted-main {
+            background-color: #1b6d85;
+        }
+
+        .twisted-side-right {
+            background-color: #398439;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h2>Twisted layout</h2>
+
+    <p>
+        Layout has one stretch side (left) and one static (right).
+        Good point is to set equal height to both sides.
+        Container must have two classes: <code>.twisted-container-&lt;threshold&gt;</code> and <code>.twisted-container-&lt;width&gt;</code>.
+        Following threshold classes are supported:
+    </p>
+
+    <ul>
+        <li>
+            <code>.twisted-container-xs</code>
+        </li>
+
+        <li>
+            <code>.twisted-container-sm</code>
+        </li>
+
+        <li>
+            <code>.twisted-container-md</code>
+        </li>
+
+        <li>
+            <code>.twisted-container-lg</code>
+        </li>
+    </ul>
+
+    <p>
+        Following width classes are supported:
+    </p>
+
+    <ul>
+        <li>
+            <code>.twisted-container-2</code>
+            (side width=16.66666667%)
+        </li>
+
+        <li>
+            <code>.twisted-container-4</code>
+            (side width=33.33333333%)
+        </li>
+
+        <li>
+            <code>.twisted-container-6</code>
+            (side width=50%)
+        </li>
+
+        <li>
+            <code>.twisted-container-8</code>
+            (side width=66.66666667%)
+        </li>
+
+        <li>
+            <code>.twisted-container-10</code>
+            (side width=83.33333333%)
+        </li>
+    </ul>
+
+    <h3>
+        Extra small
+        <small>Always horizontal</small>
+    </h3>
+
+    <div class="twisted-container-xs twisted-container-10">
+        <div class="twisted-main">
+            <code>.twisted-container-10</code>
+        </div>
+
+        <div class="twisted-side-right">
+            side
+        </div>
+    </div>
+
+    <div class="twisted-container-xs twisted-container-8">
+        <div class="twisted-main">
+            <code>.twisted-container-8</code>
+        </div>
+
+        <div class="twisted-side-right">
+            side
+        </div>
+    </div>
+
+    <div class="twisted-container-xs twisted-container-6">
+        <div class="twisted-main">
+            <code>.twisted-container-6</code>
+        </div>
+
+        <div class="twisted-side-right">
+            side
+        </div>
+    </div>
+
+    <div class="twisted-container-xs twisted-container-4">
+        <div class="twisted-main">
+            <code>.twisted-container-4</code>
+        </div>
+
+        <div class="twisted-side-right">
+            side
+        </div>
+    </div>
+
+    <div class="twisted-container-xs twisted-container-2">
+        <div class="twisted-main">
+            <code>.twisted-container-2</code>
+        </div>
+
+        <div class="twisted-side-right">
+            side
+        </div>
+    </div>
+
+    <h3>
+        Small
+        <small>Collapsed on 768px</small>
+    </h3>
+
+    <div class="twisted-container-sm twisted-container-10">
+        <div class="twisted-main">
+            <code>.twisted-container-10</code>
+        </div>
+
+        <div class="twisted-side-right">
+            side
+        </div>
+    </div>
+
+    <div class="twisted-container-sm twisted-container-8">
+        <div class="twisted-main">
+            <code>.twisted-container-8</code>
+        </div>
+
+        <div class="twisted-side-right">
+            side
+        </div>
+    </div>
+
+    <div class="twisted-container-sm twisted-container-6">
+        <div class="twisted-main">
+            <code>.twisted-container-6</code>
+        </div>
+
+        <div class="twisted-side-right">
+            side
+        </div>
+    </div>
+
+    <div class="twisted-container-sm twisted-container-4">
+        <div class="twisted-main">
+            <code>.twisted-container-4</code>
+        </div>
+
+        <div class="twisted-side-right">
+            side
+        </div>
+    </div>
+
+    <div class="twisted-container-sm twisted-container-2">
+        <div class="twisted-main">
+            <code>.twisted-container-2</code>
+        </div>
+
+        <div class="twisted-side-right">
+            side
+        </div>
+    </div>
+
+    <h3>
+        Medium
+        <small>Collapsed on 992px</small>
+    </h3>
+
+    <div class="twisted-container-md twisted-container-10">
+        <div class="twisted-main">
+            <code>.twisted-container-10</code>
+        </div>
+
+        <div class="twisted-side-right">
+            side
+        </div>
+    </div>
+
+    <div class="twisted-container-md twisted-container-8">
+        <div class="twisted-main">
+            <code>.twisted-container-8</code>
+        </div>
+
+        <div class="twisted-side-right">
+            side
+        </div>
+    </div>
+
+    <div class="twisted-container-md twisted-container-6">
+        <div class="twisted-main">
+            <code>.twisted-container-6</code>
+        </div>
+
+        <div class="twisted-side-right">
+            side
+        </div>
+    </div>
+
+    <div class="twisted-container-md twisted-container-4">
+        <div class="twisted-main">
+            <code>.twisted-container-4</code>
+        </div>
+
+        <div class="twisted-side-right">
+            side
+        </div>
+    </div>
+
+    <div class="twisted-container-md twisted-container-2">
+        <div class="twisted-main">
+            <code>.twisted-container-2</code>
+        </div>
+
+        <div class="twisted-side-right">
+            side
+        </div>
+    </div>
+
+    <h3>
+        Large
+        <small>Collapsed on 1200px</small>
+    </h3>
+
+    <div class="twisted-container-lg twisted-container-10">
+        <div class="twisted-main">
+            <code>.twisted-container-10</code>
+        </div>
+
+        <div class="twisted-side-right">
+            side
+        </div>
+    </div>
+
+    <div class="twisted-container-lg twisted-container-8">
+        <div class="twisted-main">
+            <code>.twisted-container-8</code>
+        </div>
+
+        <div class="twisted-side-right">
+            side
+        </div>
+    </div>
+
+    <div class="twisted-container-lg twisted-container-6">
+        <div class="twisted-main">
+            <code>.twisted-container-6</code>
+        </div>
+
+        <div class="twisted-side-right">
+            side
+        </div>
+    </div>
+
+    <div class="twisted-container-lg twisted-container-4">
+        <div class="twisted-main">
+            <code>.twisted-container-4</code>
+        </div>
+
+        <div class="twisted-side-right">
+            side
+        </div>
+    </div>
+
+    <div class="twisted-container-lg twisted-container-2">
+        <div class="twisted-main">
+            <code>.twisted-container-2</code>
+        </div>
+
+        <div class="twisted-side-right">
+            side
+        </div>
+    </div>
+</div>
+</body>
+</html>
