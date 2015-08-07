@@ -21,7 +21,7 @@
     padding: 10px;
     font-weight: bold;
     background: repeating-linear-gradient(
-        -55deg,
+        55deg,
         #222,
         #222 10px,
         #333 10px,
@@ -29,42 +29,42 @@
     );
 }
 
-.item {
-    display: block;
-    padding: 10px;
-    color: white;
-}
-
 .corner-wrapped {
     margin-bottom: 10px;
 
-    &.item-green {
-        &.item-20 {
+    &.corner-green {
+        &.corner-20 {
             .makeCorner(@colorGreen, 20px);
         }
 
-        &.item-30 {
+        &.corner-30 {
             .makeCorner(@colorGreen, 30px);
         }
     }
 
-    &.item-red {
-        &.item-20 {
+    &.corner-red {
+        &.corner-20 {
             .makeCorner(@colorRed, 20px);
         }
 
-        &.item-30 {
+        &.corner-30 {
             .makeCorner(@colorRed, 30px);
         }
     }
 
-    &.item-yellow {
-        &.item-20 {
+    &.corner-yellow {
+        &.corner-20 {
             .makeCorner(@colorYellow, 20px);
         }
 
-        &.item-30 {
+        &.corner-30 {
             .makeCorner(@colorYellow, 30px);
         }
     }
+}
+
+.item {
+    display: block;
+    padding: 10px;
+    color: white;
 }

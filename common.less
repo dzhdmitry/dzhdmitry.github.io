@@ -2,7 +2,19 @@ body {
     padding-top: 15px;
 }
 
-.wrappedCorner(@backgroundColor, @width) {
+// Wrapped corner on bottom-right ->
+// 1. wrappedCornerStyle for all containers, wrappedCornerColor for many containers with different background-color
+// (for non-repeating general styles for each color)
+@defaultWidth: 20px;
+@defaultCornerColor: rgba(0, 0, 0, 0.2);
+
+.wrappedCornerColor(@backgroundColor) {
+    &:before {
+        border-left-color: @backgroundColor;
+    }
+}
+
+.wrappedCornerStyle(@width: @defaultWidth, @cornerColor: @defaultCornerColor) {
     @borderBottomWidth: (@width * 0.4) + 8;
     @bottom: (@width * -0.6) + (@width * -0.2) + 9;
 
@@ -22,7 +34,6 @@ body {
 
         border-width: 0 0 @borderBottomWidth @width;
         border-bottom-color: transparent;
-        border-left-color: @backgroundColor;
     }
 
     &:after {
@@ -31,6 +42,12 @@ body {
         transform: rotate(-90deg) skewX(20deg);
 
         border-width: 0 10px @width 0;
-        border-color: @colorTransparent @colorTransparent transparent transparent;
+        border-color: @cornerColor @cornerColor transparent transparent;
     }
+}
+
+// 2. Single style for container
+.wrappedCorner(@backgroundColor, @width: @defaultWidth, @cornerColor: @defaultCornerColor) {
+    .wrappedCornerColor(@backgroundColor);
+    .wrappedCornerStyle(@width, @cornerColor);
 }
