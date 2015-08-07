@@ -1,3 +1,36 @@
 body {
     padding-top: 15px;
 }
+
+.wrappedCorner(@backgroundColor, @width) {
+    @borderBottomWidth: (@width * 0.4) + 8;
+    @bottom: (@width * -0.6) + (@width * -0.2) + 9;
+
+    position: relative;
+    overflow-y: hidden;
+
+    &:before, &:after {
+        content: "";
+        position: absolute;
+        right: 0;
+        border-style: solid;
+    }
+
+    &:before {
+        height: 100%;
+        top: 0;
+
+        border-width: 0 0 @borderBottomWidth @width;
+        border-bottom-color: transparent;
+        border-left-color: @backgroundColor;
+    }
+
+    &:after {
+        width: @width;
+        bottom: @bottom;
+        transform: rotate(-90deg) skewX(20deg);
+
+        border-width: 0 10px @width 0;
+        border-color: @colorTransparent @colorTransparent transparent transparent;
+    }
+}
