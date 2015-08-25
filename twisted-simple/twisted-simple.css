@@ -1,0 +1,13 @@
+.twisted-main,
+.twisted-side-right {
+  float: left;
+  height: 100%;
+}
+.twisted-main {
+  width: 100%;
+  padding-right: 110px;
+}
+.twisted-side-right {
+  width: 100px;
+  margin-left: -100px;
+}

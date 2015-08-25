@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Twisted [simple] layout</title>
+    <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .twisted-main, .twisted-side-right {
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .twisted-main {
+            background-color: #1b6d85;
+        }
+
+        .twisted-side-right {
+            background-color: #398439;
+        }
+    </style>
+
+    <link href="twisted-simple.css" rel="stylesheet">
+</head>
+
+<body>
+<div class="container">
+    <h2>Twisted [simple] layout</h2>
+
+    <p>
+        Layout has one stretch side (left) and one static (right).
+    </p>
+
+    <div>
+        <div class="twisted-main">
+            stretch
+        </div>
+
+        <div class="twisted-side-right">
+            static
+        </div>
+    </div>
+</div>
+</body>
+</html>
