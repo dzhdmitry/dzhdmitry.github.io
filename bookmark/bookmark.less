@@ -1,0 +1,60 @@
+@import "../common";
+
+.createBookmark(@width, @height, @color, @float: right) {
+    @cornerWidth: 20px;
+    @cornerHeight: @height / 2;
+
+    float: @float;
+    width: @width * 2;
+    height: 0;
+
+    .verticalText();
+
+    > div {
+        width: 50%;
+        height: @height;
+        position: relative;
+        background-color: @color;
+
+        &:before, &:after {
+            content: " ";
+            position: absolute;
+            left: -@cornerWidth;
+            display: block;
+            width: @cornerWidth;
+            height: 50%;
+            border-left: @cornerWidth solid transparent;
+        }
+
+        &:before {
+            top: 0;
+            border-top: @cornerHeight solid @color;
+        }
+
+        &:after {
+            bottom: 0;
+            border-bottom: @cornerHeight solid @color;
+        }
+    }
+}
+
+.bookmark-area {
+    min-height: 200px;
+    background-color: #1e3016;
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+.bookmark {
+    box-sizing: border-box;
+    display: inline-block;
+    text-align: center;
+    margin-right: 20px;
+
+    .createBookmark(140px, 80px, rgba(183, 7, 1, 0.9));
+
+    > div {
+        padding: 30px 10px;
+        color: #fff;
+    }
+}

@@ -2,6 +2,23 @@ body {
     padding-top: 15px;
 }
 
+//Vertical text
+.verticalText() {
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+    transform: rotate(-90deg);
+
+    -webkit-transform-origin: 50% 50%;
+    -moz-transform-origin: 50% 50%;
+    -ms-transform-origin: 50% 50%;
+    -o-transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
+
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+}
+
 // Wrapped corner on bottom-right ->
 // 1. wrappedCornerStyle for all containers, wrappedCornerColor for many containers with different background-color
 // (for non-repeating general styles for each color)
