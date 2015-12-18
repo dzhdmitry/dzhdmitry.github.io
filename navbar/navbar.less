@@ -1,0 +1,82 @@
+@screen-sm: 768px;
+@screen-md: 992px;
+@navbar-top-sm-height: 40px;
+@navbar-top-height: 50px;
+
+.link-color() {
+    color: #4692b4;
+
+    &:hover, &:focus {
+        color: darken(#4692b4, 20%);
+    }
+}
+
+.navbar-top {
+    min-height: @navbar-top-sm-height;
+    background-color: white;
+
+    .dropdown-menu > li > a {
+        .link-color;
+    }
+}
+
+.brand-container {
+    height: @navbar-top-sm-height;
+    overflow-y: visible;
+    float: left;
+}
+
+.aa-brand {
+    display: block;
+    width: 249px;
+    height: 74px;
+    background-image: url("https://aa-rebuild.webfit.co.nz/bundles/app/images/logo-new.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.navbar-fixed-top .aa-brand {
+    width: 200px;
+    height: 60px;
+}
+
+@media screen and (min-width: @screen-sm) {
+    body {
+        padding-top: @navbar-top-sm-height + 20px;
+    }
+
+    .brand-container {
+        margin-left: -15px;
+    }
+
+    .navbar-top .navbar-nav > li {
+        > a {
+            font-size: 13px;
+            padding: 15px 10px 5px 10px;
+            .link-color;
+        }
+
+        &:last-child > a {
+            border-right-width: 0;
+        }
+    }
+}
+
+@media screen and (min-width: @screen-md) {
+    body {
+        padding-top: @navbar-top-height + 20px;
+    }
+
+    .navbar-fixed-top .aa-brand {
+        width: 249px;
+        height: 74px;
+    }
+
+    .navbar-top {
+        min-height: @navbar-top-height;
+
+        .navbar-nav > li > a {
+            padding: 25px 12px 5px 12px;
+        }
+    }
+}
