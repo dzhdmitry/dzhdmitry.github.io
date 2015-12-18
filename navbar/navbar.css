@@ -33,6 +33,9 @@
   .brand-container {
     margin-left: -15px;
   }
+  .navbar-right {
+    margin-right: -5px;
+  }
   .navbar-top .navbar-nav > li > a {
     padding: 15px 10px 5px 10px;
     color: #4692b4;
