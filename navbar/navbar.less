@@ -1,6 +1,5 @@
 @screen-sm: 768px;
 @screen-md: 992px;
-@navbar-top-sm-height: 40px;
 @navbar-top-height: 50px;
 
 .link-color() {
@@ -11,9 +10,15 @@
     }
 }
 
+.box-shadow(@arguments) {
+    -webkit-box-shadow: @arguments;
+    -moz-box-shadow: @arguments;
+    box-shadow: @arguments;
+}
+
 .navbar-top {
-    min-height: @navbar-top-sm-height;
     background-color: white;
+    .box-shadow(0px 0px 10px 0px rgba(0, 0, 0, 0.2));
 
     .dropdown-menu > li > a {
         .link-color;
@@ -21,7 +26,7 @@
 }
 
 .brand-container {
-    height: @navbar-top-sm-height;
+    height: @navbar-top-height;
     overflow-y: visible;
     float: left;
 }
@@ -35,32 +40,20 @@
     background-repeat: no-repeat;
 }
 
-.navbar-fixed-top .aa-brand {
-    width: 200px;
-    height: 60px;
-}
-
-@media screen and (min-width: @screen-sm) {
-    body {
-        padding-top: @navbar-top-sm-height + 20px;
+.navbar-top {
+    .aa-brand {
+        width: 249px;
+        height: 74px;
     }
 
-    .brand-container {
-        margin-left: -15px;
+    .navbar-nav > li > a {
+        padding: 20px 15px 10px 15px;
+        .link-color;
     }
 
-    .navbar-right {
-        margin-right: -5px;
-    }
-
-    .navbar-top .navbar-nav > li {
-        > a {
-            padding: 15px 10px 5px 10px;
-            .link-color;
-        }
-
-        &:last-child > a {
-            border-right-width: 0;
+    &.navbar-static-top {
+        .navbar-nav > li > a {
+            padding: 10px 15px 10px 15px;
         }
     }
 }
@@ -68,18 +61,5 @@
 @media screen and (min-width: @screen-md) {
     body {
         padding-top: @navbar-top-height + 20px;
-    }
-
-    .navbar-fixed-top .aa-brand {
-        width: 249px;
-        height: 74px;
-    }
-
-    .navbar-top {
-        min-height: @navbar-top-height;
-
-        .navbar-nav > li > a {
-            padding-top: 25px;
-        }
     }
 }
