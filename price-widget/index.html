@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Price widget</title>
-    <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="price-widget.css" rel="stylesheet">
 </head>
 
@@ -47,7 +47,7 @@
             <%= dayOfWeek %><br><%= day %> <%= month %>
         </div>
 
-        <div class="panel-body day-<%= type %>">
+        <div class="panel-body day-<%= type %><% if (isActive) { %> day-active<% } %>">
             <% if (type == "sold") { %>
                 SOLD
             <% } else { %>
@@ -77,14 +77,15 @@
     </script>
 
     <script src="../jquery-2.1.4.min.js" type="text/javascript"></script>
-    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.2.3/backbone-min.js" type="text/javascript"></script>
+    <script src="../js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="../js/underscore-min.js" type="text/javascript"></script>
+    <script src="../js/backbone-min.js" type="text/javascript"></script>
     <script src="ajax.js" type="text/javascript"></script>
     <script src="price-widget.js" type="text/javascript"></script>
+    <script src="booking-price-widget.js" type="text/javascript"></script>
 
     <script>
-        var w1, w2;
+        var priceWidget, bookingPriceWidget;
         var DATA = [
             {dayOfWeek: "Mon", day: 30, year: 2015, month: "Nov", type: "poa",       currency: "$", price: 205, discount: 0},
             {dayOfWeek: "Tue",  day: 1, year: 2015, month: "Dec", type: "poa",       currency: "$", price: 205, discount: 0},
@@ -100,33 +101,23 @@
             {dayOfWeek: "Thu", day: 10, year: 2015, month: "Dec", type: "available", currency: "$", price: 205, discount: 0},
             {dayOfWeek: "Fri", day: 11, year: 2015, month: "Dec", type: "available", currency: "$", price: 205, discount: 15},
             {dayOfWeek: "Sat", day: 12, year: 2015, month: "Dec", type: "available", currency: "$", price: 205, discount: 15},
-            {dayOfWeek: "Sun", day: 13, year: 2015, month: "Dec", type: "available", currency: "$", price: 205, discount: 15}/*,
-
-            {dayOfWeek: "Mon", day: 14, year: 2015, month: "Dec", type: "sold",      currency: "$", price: 225, discount: 0},
-            {dayOfWeek: "Tue", day: 15, year: 2015, month: "Dec", type: "sold",      currency: "$", price: 225, discount: 0},
-            {dayOfWeek: "Wed", day: 15, year: 2015, month: "Dec", type: "sold",      currency: "$", price: 225, discount: 0},
-            {dayOfWeek: "Thu", day: 17, year: 2015, month: "Dec", type: "available", currency: "$", price: 225, discount: 0},
-            {dayOfWeek: "Fri", day: 18, year: 2015, month: "Dec", type: "available", currency: "$", price: 225, discount: 0},
-            {dayOfWeek: "Sat", day: 19, year: 2015, month: "Dec", type: "available", currency: "$", price: 225, discount: 0},
-            {dayOfWeek: "Sun", day: 20, year: 2015, month: "Dec", type: "available", currency: "$", price: 225, discount: 0}*/
+            {dayOfWeek: "Sun", day: 13, year: 2015, month: "Dec", type: "available", currency: "$", price: 205, discount: 15}
         ];
 
         $(function() {
             var $w = $('#widgets');
 
-            w1 = $w.priceWidget({
+            priceWidget = $w.priceWidget({
                 days: DATA
             });
 
-            var data2 = _.map(DATA, function(item) {
-                return _.extend({}, item, {
-                    checkbox: true
-                });
+            bookingPriceWidget = $w.bookingPriceWidget({
+                minDays: 3,
+                days: DATA
             });
 
-            w2 = $w.priceWidget({
-                booking: true,
-                days: data2
+            $w.on('booking.change', function(e, view) {
+                console.log('booking.change', view);
             });
         });
     </script>

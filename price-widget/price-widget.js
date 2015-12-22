@@ -1,6 +1,7 @@
-(function($) {
+var PriceWidget = {};
+
+$(function() {
     var DAYS_PER_PAGE = 7,
-        $window = $(window),
         loadingTemplate = _.template($('#day-loading-template').html())();
 
     var Day = Backbone.Model.extend({
@@ -16,7 +17,8 @@
                 discount: 0,
                 type: "",
                 checkbox: false,
-                isChecked: false
+                isChecked: false,
+                isActive: false
             };
         },
         urlRoot: "",
@@ -49,8 +51,7 @@
         template: _.template($('#day-template').html()),
         events: {
             'mouseenter': "mouseEnter",
-            'mouseleave': "mouseLeave",
-            'change input[type="checkbox"]': "checked"
+            'mouseleave': "mouseLeave"
         },
         initialize: function() {
             this.listenTo(this.model, 'change', this.render);
@@ -69,90 +70,6 @@
         },
         mouseLeave: function(e) {
             //console.log("mouseleave", e, this);
-        },
-        checked: function(e) {
-            var currentPosition,
-                from,
-                to,
-                currentModel = this.model,
-                collection = currentModel.collection,
-                isChecked = $(e.currentTarget).prop("checked"),
-                currentPassed = false,
-                checkedBefore = [],
-                checkedAfter = [];
-
-            currentModel.set("isChecked", isChecked);
-
-            collection.each(function(model, i) {
-                if (model.id == currentModel.id) {
-                    currentPassed = true;
-                    currentPosition = i;
-                } else {
-                    if (currentPassed) { // after current
-                        if (model.get("isChecked")) {
-                            if (isChecked) {
-                                if (_.isUndefined(to)) {
-                                    to = i;
-                                }
-                            } else {
-                                checkedAfter.push(i);
-                            }
-                        }
-                    } else { // before current
-                        if (model.get("isChecked")) {
-                            if (isChecked) {
-                                from = i + 1;
-                            } else {
-                                checkedBefore.push(i);
-                            }
-                        }
-                    }
-                }
-            });
-
-            if (isChecked) {
-                // Merge checked with current
-                var soldFound = false;
-
-                if (_.isUndefined(from)) {
-                    from = currentPosition + 1;
-                }
-
-                if (_.isUndefined(to)) {
-                    to = currentPosition;
-                }
-
-                _.each(collection.slice(from, to), function(model) {
-                    if (model.get("type") == "sold" || model.get("type") == "poa") {
-                        soldFound = true;
-                    } else {
-                        model.set("isChecked", isChecked);
-                    }
-                });
-
-                if (soldFound) { // actually any unavailable checkbox
-                    collection.each(function(model) {
-                        model.set("isChecked", (model.id == currentModel.id));
-                    });
-                }
-            } else {
-                // Detect which part (left/right) is smaller and uncheck it
-                if (checkedBefore.length < checkedAfter.length) {
-                    from = _.first(checkedBefore);
-                    to = _.last(checkedBefore) + 1;
-                } else {
-                    from = _.first(checkedAfter);
-                    to = _.last(checkedAfter) + 1;
-                }
-
-                if (!_.isUndefined(from) && !_.isUndefined(to)) {
-                    _.each(collection.slice(from, to), function(model) {
-                        model.set("isChecked", isChecked);
-                    });
-                }
-            }
-
-            collection.widget.updateTotal();
         }
     });
 
@@ -240,17 +157,12 @@
     var Widget = Backbone.Model.extend({
         defaults: function() {
             return {
-                booking: false,
-                minDays: 1,
                 days: []
             };
-        },
-        updateTotal: _.debounce(function() {
-            console.log("updateTotal");
-        }, 2000)
+        }
     });
 
-    var WidgetView = Backbone.View.extend({
+    var AbstractWidgetView = Backbone.View.extend({
         tagName: 'div',
         template: _.template($('#widget-template').html()),
         events: {
@@ -261,33 +173,11 @@
         },
         initialize: function(options) {
             this.page = 0;
-            this.lastWidth = null;
         },
         render: function() {
-            var self = this;
-
             this.$el.html(this.template(this.model.toJSON()));
 
             this.container = this.$el.find('ul.prices-container');
-
-            if (this.model.get("booking")) {
-                this.$el.addClass("price-widget-booking");
-            }
-
-            this.model.days = new DayCollection(this.model.get("days"), {
-                container: this.container,
-                widget: this.model
-            });
-
-            $window.on("resize", _.debounce(function() {
-                var width = self.container.parent().width();
-
-                if (self.lastWidth != width) {
-                    self.lastWidth = width;
-
-                    //
-                }
-            }, 1000));
 
             return this;
         },
@@ -339,6 +229,27 @@
         DIRECTION_RIGHT: "right"
     });
 
+    var WidgetView = AbstractWidgetView.extend({
+        render: function() {
+            WidgetView.__super__.render.call(this);
+
+            this.model.days = new DayCollection(this.model.get("days"), {
+                container: this.container,
+                widget: this.model
+            });
+
+            return this;
+        }
+    });
+
+    PriceWidget = {
+        Day: Day,
+        DayView: DayView,
+        DayCollection: DayCollection,
+        Widget: Widget,
+        AbstractWidgetView: AbstractWidgetView
+    };
+
     /**
      * Price Widget
      *
@@ -346,14 +257,8 @@
      * @returns {$|jQuery}
      */
     $.fn.priceWidget = function(options) {
-        this.each(function(i, container) {
-            var view = new WidgetView({
-                model: new Widget(options)
-            });
+        var view = new WidgetView({model: new Widget(options)});
 
-            $(container).append(view.render().el);
-        });
-
-        return this;
+        return this.append(view.render().el);
     };
-})(jQuery);
+});
