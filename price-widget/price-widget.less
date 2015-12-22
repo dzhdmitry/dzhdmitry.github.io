@@ -1,0 +1,146 @@
+@widget-control-width: 32px;
+@day-vertical-margin: 5px;
+
+@color-primary: #59a1bf;
+@day-background: #d6d6d7;
+@day-background-hover: lighten(@day-background, 5%);
+
+.btn-group-vertical {
+    margin-top: 12px;
+
+    > .btn {
+        padding: 8px 8px;
+    }
+
+    &.btn-group-left {
+        float: left;
+
+        > .btn {
+            &:first-child {
+                border-top-right-radius: 0;
+            }
+
+            &:last-child {
+                border-bottom-right-radius: 0;
+            }
+        }
+    }
+
+    &.btn-group-right {
+        float: right;
+
+        > .btn {
+            &:first-child {
+                border-top-left-radius: 0;
+            }
+
+            &:last-child {
+                border-bottom-left-radius: 0;
+            }
+        }
+    }
+}
+
+.price-widget {
+    margin-left: @widget-control-width - 1;
+    margin-right: @widget-control-width - 1;
+    border-radius: 8px;
+
+    > .panel-body {
+        margin: 5px;
+        padding: 0;
+        overflow-x: hidden;
+        border-radius: 4px;
+    }
+}
+
+.prices-container {
+    width: 10000px;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+    position: relative;
+}
+
+.price-widget-booking {
+    .btn-group-vertical {
+        margin-top: 24px;
+    }
+
+    .day-discount {
+        margin-bottom: @day-vertical-margin;
+    }
+}
+
+.panel.panel-day {
+    border: 0;
+    float: left;
+    margin: 0 2px 0 0;
+    text-align: center;
+    background-color: @day-background;
+    width: 55px;
+    max-width: 55px;
+    list-style: none;
+    cursor: pointer;
+
+    &:hover {
+        background-color: @day-background-hover;
+    }
+
+    &:last-child {
+        margin-right: 0;
+    }
+
+    &.day-loading {
+        background-color: transparent;
+        background-image: url(http://aa-rebuild/bundles/app/images/loading-green.gif);
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position-y: 50%;
+        height: 85px;
+        cursor: inherit;
+        box-shadow: none;
+    }
+
+    > .panel-heading, > .panel-body, > .panel-footer {
+        background-color: transparent;
+        padding: @day-vertical-margin 3px;
+    }
+
+    > .panel-heading {
+        font-size: 11px;
+        line-height: 11px;
+        color: #5d5d5d;
+    }
+
+    > .panel-body {
+        font-size: 13px;
+        font-weight: bold;
+        color: white;
+
+        &.day-available {
+            background-color: @color-primary;
+        }
+
+        &.day-active {
+            background-color: #61bc5b;
+        }
+
+        &.day-poa {
+            background-color: #d39106;
+        }
+
+        &.day-sold {
+            background-color: #d86e6e;
+        }
+    }
+
+    > .panel-footer {
+        font-size: 12px;
+    }
+
+    .day-booking {
+        border-top: 1px solid #eee;
+        margin-bottom: -4px;
+    }
+}

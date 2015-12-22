@@ -1,0 +1,110 @@
+.btn-group-vertical {
+  margin-top: 12px;
+}
+.btn-group-vertical > .btn {
+  padding: 8px 8px;
+}
+.btn-group-vertical.btn-group-left {
+  float: left;
+}
+.btn-group-vertical.btn-group-left > .btn:first-child {
+  border-top-right-radius: 0;
+}
+.btn-group-vertical.btn-group-left > .btn:last-child {
+  border-bottom-right-radius: 0;
+}
+.btn-group-vertical.btn-group-right {
+  float: right;
+}
+.btn-group-vertical.btn-group-right > .btn:first-child {
+  border-top-left-radius: 0;
+}
+.btn-group-vertical.btn-group-right > .btn:last-child {
+  border-bottom-left-radius: 0;
+}
+.price-widget {
+  margin-left: 31px;
+  margin-right: 31px;
+  border-radius: 8px;
+}
+.price-widget > .panel-body {
+  margin: 5px;
+  padding: 0;
+  overflow-x: hidden;
+  border-radius: 4px;
+}
+.prices-container {
+  width: 10000px;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
+  position: relative;
+}
+.price-widget-booking .btn-group-vertical {
+  margin-top: 24px;
+}
+.price-widget-booking .day-discount {
+  margin-bottom: 5px;
+}
+.panel.panel-day {
+  border: 0;
+  float: left;
+  margin: 0 2px 0 0;
+  text-align: center;
+  background-color: #d6d6d7;
+  width: 55px;
+  max-width: 55px;
+  list-style: none;
+  cursor: pointer;
+}
+.panel.panel-day:hover {
+  background-color: #e3e3e4;
+}
+.panel.panel-day:last-child {
+  margin-right: 0;
+}
+.panel.panel-day.day-loading {
+  background-color: transparent;
+  background-image: url(http://aa-rebuild/bundles/app/images/loading-green.gif);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position-y: 50%;
+  height: 85px;
+  cursor: inherit;
+  box-shadow: none;
+}
+.panel.panel-day > .panel-heading,
+.panel.panel-day > .panel-body,
+.panel.panel-day > .panel-footer {
+  background-color: transparent;
+  padding: 5px 3px;
+}
+.panel.panel-day > .panel-heading {
+  font-size: 11px;
+  line-height: 11px;
+  color: #5d5d5d;
+}
+.panel.panel-day > .panel-body {
+  font-size: 13px;
+  font-weight: bold;
+  color: white;
+}
+.panel.panel-day > .panel-body.day-available {
+  background-color: #59a1bf;
+}
+.panel.panel-day > .panel-body.day-active {
+  background-color: #61bc5b;
+}
+.panel.panel-day > .panel-body.day-poa {
+  background-color: #d39106;
+}
+.panel.panel-day > .panel-body.day-sold {
+  background-color: #d86e6e;
+}
+.panel.panel-day > .panel-footer {
+  font-size: 12px;
+}
+.panel.panel-day .day-booking {
+  border-top: 1px solid #eee;
+  margin-bottom: -4px;
+}
