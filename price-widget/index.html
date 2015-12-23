@@ -93,7 +93,9 @@
     </script>
 
     <script id="day-loading-template" type="text/html">
-        <li class="panel panel-day day-loading"></li>
+        <% _.times(length, function() { %>
+            <li class="panel panel-day day-loading"></li>
+        <% }); %>
     </script>
 
     <script id="day-popover-template" type="text/html">
@@ -142,7 +144,7 @@
         $(function() {
             var FORMAT_SERVER = "MM/DD/YYYY",
                 $w = $('#widgets'),
-                day = moment();
+                day = moment("11/30/2015", FORMAT_SERVER);
 
             DATA = _.map(DATA, function(item) {
                 day.add(1, 'days');
@@ -164,15 +166,15 @@
             });
 
             $w.on('prices.change', function(e, view) {
-                console.log('prices.change', view);
+                //console.log('prices.change', view);
             });
 
             $w.on('price.day.mouseenter', function(e, view) {
-                console.log('price.day.mouseenter', view);
+                //console.log('price.day.mouseenter', view);
             });
 
             $w.on('price.day.mouseleave', function(e, view) {
-                console.log('price.day.mouseleave', view);
+                //console.log('price.day.mouseleave', view);
             });
         });
     </script>

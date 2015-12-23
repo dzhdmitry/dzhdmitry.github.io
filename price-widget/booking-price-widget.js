@@ -100,7 +100,7 @@ $(function() {
             }
 
             collection.selectionChanged();
-            collection.widget.lazyChange();
+            collection.widget.model.lazyChange();
         }
     });
 
@@ -109,7 +109,7 @@ $(function() {
         model: Day,
         selectionChanged: function() {
             var checked = this.where({isChecked: true}),
-                isActive = checked.length >= this.widget.get("minNights");
+                isActive = checked.length >= this.widget.model.get("minNights");
 
             this.each(function(day) {
                 day.set('isActive', isActive ? day.get('isChecked') : false);
@@ -138,9 +138,7 @@ $(function() {
             this.$el.addClass("price-widget-booking");
 
             this.model.days = new DayCollection(this.model.get("days"), {
-                container: this.pricesContainer,
-                widget: this.model,
-                url: this.model.get("url")
+                widget: this
             });
 
             return this;
@@ -152,7 +150,7 @@ $(function() {
      *
      * Events:
      *   [PriceWidget events]
-     *   `prices.change` (event, widget) Triggers when prices selection changed
+     *   `prices.change` (event, widgetView) Triggers when prices selection changed
      *
      * @param {Object} options for Widget model. See Widget.defaults()
      * @returns {$|jQuery}

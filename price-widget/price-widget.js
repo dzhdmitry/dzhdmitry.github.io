@@ -5,9 +5,102 @@ $(function() {
         throw new Error("PriceWidget requires moment.js");
     }
 
-    var loadingTemplate = _.template($('#day-loading-template').html())(),
+    var loadingTemplate = _.template($('#day-loading-template').html()),
         dayPopoverTemplate = $('#day-popover-template').html(),
         dayPopoverContentTemplate = _.template($('#day-popover-content-template').html());
+
+    var PagesInfo = function(pages) {
+        this.pages = {};
+
+        this.set = function(page_s, status) {
+            if (_.isArray(page_s)) {
+                _.each(page_s, function(page) {
+                    this.pages[page] = status;
+                }, this);
+            } else {
+                this.pages[page_s] = status;
+            }
+        };
+
+        this.is = function(page, status) {
+            return _.has(this.pages, page) && (this.pages[page] == status);
+        };
+
+        this.isLoading = function(page) {
+            return this.is(page, DayCollection.PAGE_LOADING);
+        };
+
+        this.isLoaded = function(page) {
+            return this.is(page, DayCollection.PAGE_LOADED);
+        };
+
+        this.isPending = function(page) {
+            return this.is(page, DayCollection.PAGE_PENDING);
+        };
+
+        /**
+         * Get indexes of pages needed to load
+         *
+         * @param {Number} page index of current page
+         * @returns {Array} with maximum 2 indexes
+         */
+        this.getRequired = function(page) {
+            var MAX_LOADING_PAGES = 3,
+                MAX_ITERATIONS = (_.size(this.pages) / 2) + MAX_LOADING_PAGES,
+                MAX_DISTANCE = 4,
+                iteration = 0,
+                iterationPage = page,
+                indexes = [];
+
+            while (indexes.length != MAX_LOADING_PAGES) {
+                if (iteration++ >= MAX_ITERATIONS || iterationPage < 0) {
+                    break;
+                }
+
+                if (Math.abs(iterationPage - page) >= MAX_DISTANCE && indexes.length == 0) {
+                    break;
+                }
+
+                var prev = iterationPage - 1,
+                    next = iterationPage + 1;
+
+                if (!this.isLoaded(iterationPage) && !_.contains(indexes, iterationPage)) {
+                    var allowed = false;
+
+                    if (indexes.length == 0) {
+                        allowed = true;
+                    } else {
+                        if (iterationPage > _.last(indexes)) {
+                            allowed = (iterationPage - _.last(indexes) == 1);
+                        } else if (iterationPage < _.first(indexes)) {
+                            allowed = (_.first(indexes) - iterationPage == 1);
+                        }
+                    }
+
+                    if (allowed) {
+                        indexes.push(iterationPage);
+                        indexes.sort(function(a, b) {
+                            return a - b;
+                        });
+                    }
+                }
+
+                if (!this.isLoaded(next)) {
+                    iterationPage = next;
+                } else {
+                    if (prev >= 0 && !this.isLoaded(prev)) {
+                        iterationPage = prev;
+                    } else {
+                        iterationPage = next + 1;
+                    }
+                }
+            }
+
+            return indexes;
+        };
+
+        this.set(_.range(pages), DayCollection.PAGE_LOADED);
+    };
 
     var Day = Backbone.Model.extend({
         defaults: function() {
@@ -80,7 +173,7 @@ $(function() {
             this.model.view = this;
 
             var data = _.extend({}, this.model.toJSON(), {
-                minNights: this.getWidget().get("minNights")
+                minNights: this.getWidget().model.get("minNights")
             });
 
             this.$el.popover({
@@ -91,6 +184,11 @@ $(function() {
                 template: dayPopoverTemplate
             });
         },
+        /**
+         * Get instance of Widget containing this day
+         *
+         * @returns {Widget}
+         */
         getWidget: function() {
             return this.model.collection.widget;
         },
@@ -110,11 +208,11 @@ $(function() {
                 this.$el.popover('show');
             }
 
-            this.getWidget().trigger('day.mouseEnter', this.model);
+            this.getWidget().trigger('day.mouseenter', this);
         },
         mouseLeave: function() {
             this.$el.popover('hide');
-            this.getWidget().trigger('day.mouseLeave', this.model);
+            this.getWidget().trigger('day.mouseleave', this);
         }
     });
 
@@ -122,57 +220,95 @@ $(function() {
         view: DayView,
         model: Day,
         url: function() {
-            return this.widget.get("url");
+            return this.widget.model.get("url");
         },
         initialize: function(models, options) {
-            this.container = options.container;
             this.widget = options.widget;
-            this.chunks = {
-                0: DayCollection.CHUNK_LOADED
-            };
+            this.container = this.widget.pricesContainer;
+
+            var length = models.length,
+                DAYS_PER_PAGE = this.widget.getDaysPerPage();
+
+            if (!this.checkLength(models)) {
+                throw new Error("Days amount must be multiple to " + DAYS_PER_PAGE + ". Current is " + length);
+            }
+
+            this.pages = new PagesInfo(length / DAYS_PER_PAGE);
+        },
+        checkLength: function(models) {
+            return (models.length % this.widget.getDaysPerPage() == 0);
         },
         /**
-         * Get index of last element in given chunk
+         * Insert loaded days into collection
          *
-         * @param {Number} n
-         * @returns {Number}
+         * @param {Array} days
+         * @param {Number} at
+         * @returns {Boolean} Adding was successful
          */
-        lastOfChunk: function(n) {
-            return ((n + 1) * DayCollection.CHUNK_SIZE) - 1;
+        addPage: function(days, at) {
+            if (this.checkLength(days)) {
+                _.each(days, function(day, i) {
+                    this.add(day, {
+                        at: at + i
+                    });
+                }, this);
+
+                return true;
+            } else {
+                return false;
+            }
         },
-        chunkIs: function(n, status) {
-            return _.has(this.chunks, n) && (this.chunks[n] == status);
+        lastDayOfPage: function(page) {
+            return ((page + 1) * this.widget.getDaysPerPage()) - 1;
         },
-        setChunk: function(n, status) {
-            this.chunks[n] = status;
+        /**
+         * Get day which $el is placed at position
+         *
+         * @param {Number} index $el position
+         * @returns {Day}
+         */
+        atContainer: function(index) {
+            var collectionIndex = 0;
+
+            this.container.find('li.panel-day').each(function(i, panel) {
+                if (i == index) {
+                    return false;
+                } else {
+                    if (!$(panel).hasClass('day-loading')) {
+                        collectionIndex++;
+                    }
+                }
+            });
+
+            return this.at(collectionIndex);
         },
         /**
          * Request to server and handle loaded days
          *
-         * @param {Number} chunk Number of chunk
+         * @param {Array} pages Indexes of pages
          * @param {Object} after [Moment] Load days directly after this date
          * @param {Number} addFrom Index of an element after which loaded days will be placed
          * @returns {*}
          */
-        fetchChunk: function(chunk, after, addFrom) {
+        fetchPages: function(pages, after, addFrom) {
             var self = this;
+
+            after.add(1, 'days');
 
             return $_ajax({
                 url: this.url(),
                 data: {
-                    after: after.format(Day.formats.SERVER)
+                    start: after.format(Day.formats.SERVER),
+                    size: pages.length * this.widget.getDaysPerPage()
                 },
                 beforeSend: function() {
-                    self.setChunk(chunk, DayCollection.CHUNK_LOADING);
+                    self.pages.set(pages, DayCollection.PAGE_LOADING);
                 }
             }).done(function(data) {
-                self.setChunk(chunk, DayCollection.CHUNK_LOADED);
-
-                _.each(data, function(item, i) {
-                    self.add(item, {
-                        at: addFrom + i
-                    });
-                });
+                if (self.addPage(data, addFrom)) {
+                    self.pages.set(pages, DayCollection.PAGE_LOADED);
+                    console.log(self.pages.pages);
+                }
             }).fail(function() {
                 //
             }).always(function() {
@@ -180,56 +316,61 @@ $(function() {
             });
         },
         /**
-         * Check if loading is needed, compose loading and run fetchChunk()
+         * Check if loading is needed, compose loading and run fetchPages()
          *
-         * @param {Number} n Number of chunk
+         * @param {Number} page Number of page
          * @returns {*}
          */
-        loadChunk: function(n) {
-            if (n < 1) {
+        loadPage: function(page) {
+            // Detecting pages need to load
+            var DAYS_PER_PAGE = this.widget.getDaysPerPage(),
+                requiredPages = this.pages.getRequired(page),
+                lastLoadedPageIndex = 0,
+                chunksLOADIND = 0;
+
+            // Prevent loading if not needed
+            if (requiredPages.length == 0) {
                 return;
             }
 
-            var self = this,
-                previous = n - 1,
-                loadingDays = "",
-                loadingCount = this.chunkIs(n, DayCollection.CHUNK_PENDING) ? 0 : DayCollection.CHUNK_SIZE;
+            // From loading pages until last loaded chunk [right to left]:
+            for (var x = _.last(requiredPages); x >= 0; x--) {
+                if (this.pages.isLoaded(x)) {
+                    lastLoadedPageIndex = x;
 
-            if (this.chunkIs(n, DayCollection.CHUNK_LOADED) || this.chunkIs(n, DayCollection.CHUNK_LOADING)) {
-                // Prevent chunk load
-                return;
+                    break;
+                }
+
+                // Set all pages PENDING, allocate LOADING
+                if (!this.pages.isPending(x)) {
+                    this.pages.set(x, DayCollection.PAGE_PENDING);
+
+                    chunksLOADIND++;
+                }
             }
 
-            if (n > 1 && !this.chunkIs(previous, DayCollection.CHUNK_LOADED)) {
-                loadingCount = DayCollection.CHUNK_SIZE * 2;
+            var distance = (_.first(requiredPages) - 1) - lastLoadedPageIndex,
+                lastDayOfPageIndex = this.lastDayOfPage(lastLoadedPageIndex),
+                lastDayOfPage = this.atContainer(lastDayOfPageIndex),
+                after = lastDayOfPage.get("date").clone();
 
-                this.setChunk(previous, DayCollection.CHUNK_PENDING);
+            if (distance > 0) {
+                // insert with gap after lastDayOfPage
+                after.add(distance * DAYS_PER_PAGE, 'days');
+
+                lastDayOfPageIndex += distance * DAYS_PER_PAGE;
             }
 
-            _.times(loadingCount, function() {
-                loadingDays += loadingTemplate;
-            });
-
-            var lastOfChunkIndex = this.lastOfChunk(previous),
-                lastOfChunk = this.at(lastOfChunkIndex),
-                after;
-
-            if (lastOfChunk) { // Forward
-                after = lastOfChunk.get("date").clone();
-            } else { // Fast forward
-                lastOfChunk = self.last();
-                after = lastOfChunk.get("date").clone().add(14, 'days');
+            if (chunksLOADIND) {
+                lastDayOfPage.view.$el.after(loadingTemplate({length: chunksLOADIND * DAYS_PER_PAGE}));
             }
 
-            lastOfChunk.view.$el.after(loadingDays);
-
-            return this.fetchChunk(n, after, lastOfChunkIndex + 1);
+            this.fetchPages(requiredPages, after, lastDayOfPageIndex + 1);
         }
     }, {
-        CHUNK_SIZE: 14,
-        CHUNK_LOADED: "loaded",
-        CHUNK_LOADING: "loading",
-        CHUNK_PENDING: "pending"
+        PAGE_LOADED: "loaded",
+        PAGE_LOADING: "loading",
+        PAGE_PENDING: "pending"
     });
 
     var Widget = Backbone.Model.extend({
@@ -237,7 +378,8 @@ $(function() {
             return {
                 minNights: 1,
                 url: "",
-                days: []
+                days: [],
+                DAYS_PER_PAGE: 7
             };
         }
     });
@@ -257,12 +399,12 @@ $(function() {
             this.page = 0;
             this.container = options.container;
 
-            this.listenTo(this.model, 'day.mouseEnter', function(day) {
-                self.container.trigger('price.day.mouseenter', day);
+            this.on('day.mouseenter', function(dayView) {
+                self.container.trigger('price.day.mouseenter', dayView);
             });
 
-            this.listenTo(this.model, 'day.mouseLeave', function(day) {
-                self.container.trigger('price.day.mouseleave', day);
+            this.on('day.mouseleave', function(dayView) {
+                self.container.trigger('price.day.mouseleave', dayView);
             });
         },
         render: function() {
@@ -272,12 +414,16 @@ $(function() {
 
             return this;
         },
-        getCurrentChunk: function() {
-            var oddPage = (this.page % 2 == 0) ? this.page : this.page - 1;
-
-            return oddPage / 2;
+        getDaysPerPage: function() {
+            return this.model.get("DAYS_PER_PAGE");
         },
-        scroll: function(e, steps, chunkOffset) {
+        /**
+         * Move prices container <steps> from current position
+         *
+         * @param {Event} e
+         * @param {Number} steps Offset
+         */
+        scroll: function(e, steps) {
             e.preventDefault();
 
             this.page += steps;
@@ -286,31 +432,27 @@ $(function() {
                 this.page = 0;
             }
 
-            var self = this,
-                containerOffset = WidgetView.DAY_WIDTH * WidgetView.DAYS_PER_PAGE * this.page;
+            var containerOffset = WidgetView.DAY_WIDTH * this.getDaysPerPage() * this.page;
 
-            chunkOffset = chunkOffset || 0;
+            this.model.days.loadPage(this.page);
 
             this.pricesContainer.animate({
                 right: containerOffset + "px"
-            }, 'fast', function() {
-                self.model.days.loadChunk(self.getCurrentChunk() + chunkOffset);
-            });
+            }, 'fast');
         },
         backward: function(e) {
             this.scroll(e, -1);
         },
         fastBackward: function(e) {
-            this.scroll(e, -4, 1);
+            this.scroll(e, -4);
         },
         forward: function(e) {
-            this.scroll(e, 1, 1);
+            this.scroll(e, 1);
         },
         fastForward: function(e) {
             this.scroll(e, 4);
         }
     }, {
-        DAYS_PER_PAGE: 7,
         DAY_WIDTH: 57
     });
 
@@ -319,9 +461,7 @@ $(function() {
             WidgetView.__super__.render.call(this);
 
             this.model.days = new DayCollection(this.model.get("days"), {
-                container: this.pricesContainer,
-                widget: this.model,
-                url: this.model.get("url")
+                widget: this
             });
 
             return this;
@@ -340,8 +480,8 @@ $(function() {
      * Price Widget
      *
      * Events:
-     *   `price.day.mouseenter` (event, day) Triggers on day mouseenter
-     *   `price.day.mouseleave` (event, day) Triggers on day mouseleave
+     *   `price.day.mouseenter` (event, dayView) Triggers on day mouseenter
+     *   `price.day.mouseleave` (event, dayView) Triggers on day mouseleave
      *
      * @param {Object} options for Widget model. See Widget.defaults()
      * @returns {$|jQuery}

@@ -6,11 +6,19 @@ $_ajax = function(options) {
     };
 
     function getPrices(data) {
-        var day = moment(data.after, FORMAT_SERVER);
+        var day = moment(data.start, FORMAT_SERVER);
         var response = [
             {type: "poa",       currency: "$", price: 205, discount: 0},
             {type: "poa",       currency: "$", price: 205, discount: 0},
             {type: "available", currency: "$", price: 205, discount: 0},
+            {type: "available", currency: "$", price: 205, discount: 0},
+            {type: "available", currency: "$", price: 205, discount: 15},
+            {type: "available", currency: "$", price: 205, discount: 15},
+            {type: "available", currency: "$", price: 205, discount: 15},
+
+            {type: "sold",      currency: "$", price: 205, discount: 0},
+            {type: "sold",      currency: "$", price: 205, discount: 0},
+            {type: "sold",      currency: "$", price: 205, discount: 0},
             {type: "available", currency: "$", price: 205, discount: 0},
             {type: "available", currency: "$", price: 205, discount: 15},
             {type: "available", currency: "$", price: 205, discount: 15},
@@ -26,12 +34,14 @@ $_ajax = function(options) {
         ];
 
         return _.map(response, function(item) {
-            day.add(1, 'days');
-
-            return _.extend({}, item, {
+            var model = _.extend({}, item, {
                 id: day.format("MM/DD/YYYY")
             });
-        });
+
+            day.add(1, 'days');
+
+            return model;
+        }).slice(0, data.size);
     }
 
     var actions = {
@@ -62,7 +72,7 @@ $_ajax = function(options) {
             return this;
         };
 
-        this.report = function(status, options) {
+        this.report = function(status, options, response) {
             var base = status;
 
             if (status == 200) {
@@ -75,6 +85,10 @@ $_ajax = function(options) {
 
             if (options.data) {
                 out.push(options.data);
+            }
+
+            if (response) {
+                out.push(response);
             }
 
             console.log.apply(console, out);
@@ -96,17 +110,19 @@ $_ajax = function(options) {
                         if (_.isFunction(fail)) {
                             fail.call(self);
                         }
+
+                        self.report(500, options);
                     } else {
                         if (_.isFunction(done)) {
                             done.call(self, data);
                         }
+
+                        self.report(200, options, data);
                     }
 
                     if (_.isFunction(always)) {
                         always.call(self);
                     }
-
-                    self.report(200, options);
                 }, _.random(REQUEST_DELAY.min, REQUEST_DELAY.max));
             } else {
                 if (_.isFunction(fail)) {
