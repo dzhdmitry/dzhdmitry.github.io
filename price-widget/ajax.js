@@ -1,42 +1,36 @@
 $_ajax = function(options) {
+    var FORMAT_SERVER = "MM/DD/YYYY";
     var REQUEST_DELAY = {
         min: 500,
         max: 2000
     };
 
     var actions = {
-        getNext14days: function(data) {
-            var parts = data.after.split("/");
+        get14days: function(data) {
+            var day = moment(data.after, FORMAT_SERVER);
             var response = [
-                {dayOfWeek: "Mon", month: "Dec", type: "poa",       currency: "$", price: 205, discount: 0},
-                {dayOfWeek: "Tue", month: "Dec", type: "poa",       currency: "$", price: 205, discount: 0},
-                {dayOfWeek: "Wed", month: "Dec", type: "available", currency: "$", price: 205, discount: 0},
-                {dayOfWeek: "Thu", month: "Dec", type: "available", currency: "$", price: 205, discount: 0},
-                {dayOfWeek: "Fri", month: "Dec", type: "available", currency: "$", price: 205, discount: 15},
-                {dayOfWeek: "Sat", month: "Dec", type: "available", currency: "$", price: 205, discount: 15},
-                {dayOfWeek: "Sun", month: "Dec", type: "available", currency: "$", price: 205, discount: 15},
+                {type: "poa",       currency: "$", price: 205, discount: 0},
+                {type: "poa",       currency: "$", price: 205, discount: 0},
+                {type: "available", currency: "$", price: 205, discount: 0},
+                {type: "available", currency: "$", price: 205, discount: 0},
+                {type: "available", currency: "$", price: 205, discount: 15},
+                {type: "available", currency: "$", price: 205, discount: 15},
+                {type: "available", currency: "$", price: 205, discount: 15},
 
-                {dayOfWeek: "Mon", month: "Dec", type: "poa",       currency: "$", price: 205, discount: 0},
-                {dayOfWeek: "Tue", month: "Dec", type: "poa",       currency: "$", price: 205, discount: 0},
-                {dayOfWeek: "Wed", month: "Dec", type: "available", currency: "$", price: 205, discount: 0},
-                {dayOfWeek: "Thu", month: "Dec", type: "available", currency: "$", price: 205, discount: 0},
-                {dayOfWeek: "Fri", month: "Dec", type: "available", currency: "$", price: 205, discount: 15},
-                {dayOfWeek: "Sat", month: "Dec", type: "available", currency: "$", price: 205, discount: 15},
-                {dayOfWeek: "Sun", month: "Dec", type: "available", currency: "$", price: 205, discount: 15}
+                {type: "poa",       currency: "$", price: 205, discount: 0},
+                {type: "poa",       currency: "$", price: 205, discount: 0},
+                {type: "available", currency: "$", price: 205, discount: 0},
+                {type: "available", currency: "$", price: 205, discount: 0},
+                {type: "available", currency: "$", price: 205, discount: 15},
+                {type: "available", currency: "$", price: 205, discount: 15},
+                {type: "available", currency: "$", price: 205, discount: 15}
             ];
 
-            var startDay = {
-                day: parseInt(parts[0], 10),
-                month: parseInt(parts[1], 10),
-                year: parseInt(parts[2], 10)
-            };
-
             return _.map(response, function(item) {
-                startDay.day++;
+                day.add(1, 'days');
 
                 return _.extend({}, item, {
-                    day: startDay.day,
-                    year: startDay.year
+                    id: day.format("MM/DD/YYYY")
                 });
             });
         }
@@ -74,6 +68,8 @@ $_ajax = function(options) {
             }
 
             if (_.has(options, "url") && _.has(actions, options.url)) {
+                console.log("GET", options.url, options.data);
+
                 data = actions[options.url].call(null, options.data);
             }
 

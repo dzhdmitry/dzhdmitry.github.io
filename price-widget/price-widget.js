@@ -1,30 +1,44 @@
 var PriceWidget = {};
 
 $(function() {
-    var DAYS_PER_PAGE = 7,
-        loadingTemplate = _.template($('#day-loading-template').html())(),
+    if (!_.has(window, "moment")) {
+        throw new Error("PriceWidget requires moment.js");
+    }
+
+    var loadingTemplate = _.template($('#day-loading-template').html())(),
         dayPopoverTemplate = $('#day-popover-template').html(),
         dayPopoverContentTemplate = _.template($('#day-popover-content-template').html());
 
     var Day = Backbone.Model.extend({
         defaults: function() {
             return {
-                id: _.uniqueId(),
-                dayOfWeek: "",
-                day: "",
-                month: "",
-                year: "",
                 currency: "$",
                 price: 0,
                 discount: 0,
                 type: "",
                 checkbox: false,
                 isChecked: false,
-                isActive: false
+                isActive: false,
+
+                // {Moment} Composed in initialize
+                date: null,
+
+                // Used in templates
+                date_SERVER: "",
+                date_LIST: "",
+                date_POPOVER: ""
             };
         },
         urlRoot: "",
         initialize: function(attributes, modelOptions) {
+            var self = this;
+
+            _.each(Day.formats, function(format, name) {
+                self.set("date_" + name, self.getDate(format));
+            });
+
+            this.set("date", moment(this.id, Day.formats.SERVER));
+
             var view = new this.collection.view({model: this}),
                 container = this.collection.container,
                 el = view.render().el;
@@ -39,13 +53,17 @@ $(function() {
                 container.append(el);
             }
         },
-        getDate: function() {
-            var month = this.get("month");
+        getDate: function(format) {
+            format = format || Day.formats.SERVER;
 
-            return this.get("day") + "/" + Day.MONTHS[month] + "/" + this.get("year");
+            return moment(this.id, Day.formats.SERVER).format(format);
         }
     }, {
-        MONTHS: {Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6, Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12}
+        formats: {
+            SERVER:  "MM/DD/YYYY",    // "m/d/Y" = 01/20/2015
+            LIST:    "ddd<br>DD MMM", // "D d M" = Mon 20 Jan
+            POPOVER: "DD MMM YYYY"    // "d M Y" = 20 Jan 2015
+        }
     });
 
     var DayView = Backbone.View.extend({
@@ -147,17 +165,17 @@ $(function() {
                 after;
 
             if (lastOfChunk) { // Forward
-                after = lastOfChunk.getDate();
+                after = lastOfChunk.get("date").clone();
             } else { // Fast forward
                 lastOfChunk = self.last();
-                after = "1/2/2015";
+                after = lastOfChunk.get("date").clone().add(14, 'days');
             }
 
             $_ajax({
-                url: "getNext14days",
+                url: "get14days",
                 data: {
                     property: _.uniqueId(),
-                    after: after
+                    after: after.format(Day.formats.SERVER)
                 },
                 beforeSend: function() {
                     self.chunks[n] = DayCollection.CHUNK_LOADING;
@@ -229,46 +247,41 @@ $(function() {
 
             return oddPage / 2;
         },
-        scroll: function(e, direction, steps, offset) {
+        scroll: function(e, steps, chunkOffset) {
             e.preventDefault();
 
-            if (direction == WidgetView.DIRECTION_LEFT) {
-                this.page -= steps;
-            } else {
-                this.page += steps;
-            }
+            this.page += steps;
 
             if (this.page < 0) { // prevent left border cross
                 this.page = 0;
             }
 
             var self = this,
-                containerOffset = WidgetView.DAY_WIDTH * DAYS_PER_PAGE * this.page;
+                containerOffset = WidgetView.DAY_WIDTH * WidgetView.DAYS_PER_PAGE * this.page;
 
-            offset = offset || 0;
+            chunkOffset = chunkOffset || 0;
 
             this.pricesContainer.animate({
                 right: containerOffset + "px"
             }, 'fast', function() {
-                self.model.days.loadChunk(self.getCurrentChunk() + offset);
+                self.model.days.loadChunk(self.getCurrentChunk() + chunkOffset);
             });
         },
         backward: function(e) {
-            this.scroll(e, WidgetView.DIRECTION_LEFT, 1);
+            this.scroll(e, -1);
         },
         fastBackward: function(e) {
-            this.scroll(e, WidgetView.DIRECTION_LEFT, 4);
+            this.scroll(e, -4, 1);
         },
         forward: function(e) {
-            this.scroll(e, WidgetView.DIRECTION_RIGHT, 1, 1);
+            this.scroll(e, 1, 1);
         },
         fastForward: function(e) {
-            this.scroll(e, WidgetView.DIRECTION_RIGHT, 4);
+            this.scroll(e, 4);
         }
     }, {
-        DAY_WIDTH: 57,
-        DIRECTION_LEFT: "left",
-        DIRECTION_RIGHT: "right"
+        DAYS_PER_PAGE: 7,
+        DAY_WIDTH: 57
     });
 
     var WidgetView = AbstractWidgetView.extend({
