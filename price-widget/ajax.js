@@ -5,35 +5,38 @@ $_ajax = function(options) {
         max: 2000
     };
 
-    var actions = {
-        get14days: function(data) {
-            var day = moment(data.after, FORMAT_SERVER);
-            var response = [
-                {type: "poa",       currency: "$", price: 205, discount: 0},
-                {type: "poa",       currency: "$", price: 205, discount: 0},
-                {type: "available", currency: "$", price: 205, discount: 0},
-                {type: "available", currency: "$", price: 205, discount: 0},
-                {type: "available", currency: "$", price: 205, discount: 15},
-                {type: "available", currency: "$", price: 205, discount: 15},
-                {type: "available", currency: "$", price: 205, discount: 15},
+    function getPrices(data) {
+        var day = moment(data.after, FORMAT_SERVER);
+        var response = [
+            {type: "poa",       currency: "$", price: 205, discount: 0},
+            {type: "poa",       currency: "$", price: 205, discount: 0},
+            {type: "available", currency: "$", price: 205, discount: 0},
+            {type: "available", currency: "$", price: 205, discount: 0},
+            {type: "available", currency: "$", price: 205, discount: 15},
+            {type: "available", currency: "$", price: 205, discount: 15},
+            {type: "available", currency: "$", price: 205, discount: 15},
 
-                {type: "poa",       currency: "$", price: 205, discount: 0},
-                {type: "poa",       currency: "$", price: 205, discount: 0},
-                {type: "available", currency: "$", price: 205, discount: 0},
-                {type: "available", currency: "$", price: 205, discount: 0},
-                {type: "available", currency: "$", price: 205, discount: 15},
-                {type: "available", currency: "$", price: 205, discount: 15},
-                {type: "available", currency: "$", price: 205, discount: 15}
-            ];
+            {type: "poa",       currency: "$", price: 205, discount: 0},
+            {type: "poa",       currency: "$", price: 205, discount: 0},
+            {type: "available", currency: "$", price: 205, discount: 0},
+            {type: "available", currency: "$", price: 205, discount: 0},
+            {type: "available", currency: "$", price: 205, discount: 15},
+            {type: "available", currency: "$", price: 205, discount: 15},
+            {type: "available", currency: "$", price: 205, discount: 15}
+        ];
 
-            return _.map(response, function(item) {
-                day.add(1, 'days');
+        return _.map(response, function(item) {
+            day.add(1, 'days');
 
-                return _.extend({}, item, {
-                    id: day.format("MM/DD/YYYY")
-                });
+            return _.extend({}, item, {
+                id: day.format("MM/DD/YYYY")
             });
-        }
+        });
+    }
+
+    var actions = {
+        '/property/1/prices': getPrices,
+        '/property/2/prices': getPrices
     };
 
     var Promise = function() {
@@ -59,6 +62,24 @@ $_ajax = function(options) {
             return this;
         };
 
+        this.report = function(status, options) {
+            var base = status;
+
+            if (status == 200) {
+                var method = _.has(options, "type") ? options.type : "get";
+
+                base = method.toUpperCase();
+            }
+
+            var out = [base, options.url];
+
+            if (options.data) {
+                out.push(options.data);
+            }
+
+            console.log.apply(console, out);
+        };
+
         this.__run__ = function() {
             var data,
                 self = this;
@@ -68,26 +89,32 @@ $_ajax = function(options) {
             }
 
             if (_.has(options, "url") && _.has(actions, options.url)) {
-                console.log("GET", options.url, options.data);
-
                 data = actions[options.url].call(null, options.data);
+
+                _.delay(function() {
+                    if (_.isUndefined(data)) {
+                        if (_.isFunction(fail)) {
+                            fail.call(self);
+                        }
+                    } else {
+                        if (_.isFunction(done)) {
+                            done.call(self, data);
+                        }
+                    }
+
+                    if (_.isFunction(always)) {
+                        always.call(self);
+                    }
+
+                    self.report(200, options);
+                }, _.random(REQUEST_DELAY.min, REQUEST_DELAY.max));
+            } else {
+                if (_.isFunction(fail)) {
+                    fail.call(self);
+                }
+
+                self.report(404, options);
             }
-
-            _.delay(function() {
-                if (_.isUndefined(data)) {
-                    if (_.isFunction(fail)) {
-                        fail.call(self);
-                    }
-                } else {
-                    if (_.isFunction(done)) {
-                        done.call(self, data);
-                    }
-                }
-
-                if (_.isFunction(always)) {
-                    always.call(self);
-                }
-            }, _.random(REQUEST_DELAY.min, REQUEST_DELAY.max));
 
             return this;
         }

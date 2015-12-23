@@ -16,6 +16,7 @@ $(function() {
                 price: 0,
                 discount: 0,
                 type: "",
+                prices: [],
                 checkbox: false,
                 isChecked: false,
                 isActive: false,
@@ -29,8 +30,7 @@ $(function() {
                 date_POPOVER: ""
             };
         },
-        urlRoot: "",
-        initialize: function(attributes, modelOptions) {
+        initialize: function(attributes, options) {
             var self = this;
 
             _.each(Day.formats, function(format, name) {
@@ -43,8 +43,8 @@ $(function() {
                 container = this.collection.container,
                 el = view.render().el;
 
-            if (_.has(modelOptions, "at")) {
-                var $replacement = container.children().eq(modelOptions.at);
+            if (_.has(options, "at")) {
+                var $replacement = container.children().eq(options.at);
 
                 if ($replacement.hasClass("day-loading")) {
                     $replacement.replaceWith(el);
@@ -96,7 +96,7 @@ $(function() {
         },
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
-            this.$el.addClass("panel panel-day").attr("data-date", this.model.getDate());
+            this.$el.addClass("panel panel-day");
 
             return this;
         },
@@ -121,20 +121,70 @@ $(function() {
     var DayCollection = Backbone.Collection.extend({
         view: DayView,
         model: Day,
-        urlRoot: "",
-        initialize: function(models, collectionOptions) {
-            this.container = collectionOptions.container;
-            this.widget = collectionOptions.widget;
+        url: function() {
+            return this.widget.get("url");
+        },
+        initialize: function(models, options) {
+            this.container = options.container;
+            this.widget = options.widget;
             this.chunks = {
                 0: DayCollection.CHUNK_LOADED
             };
         },
+        /**
+         * Get index of last element in given chunk
+         *
+         * @param {Number} n
+         * @returns {Number}
+         */
         lastOfChunk: function(n) {
             return ((n + 1) * DayCollection.CHUNK_SIZE) - 1;
         },
         chunkIs: function(n, status) {
             return _.has(this.chunks, n) && (this.chunks[n] == status);
         },
+        setChunk: function(n, status) {
+            this.chunks[n] = status;
+        },
+        /**
+         * Request to server and handle loaded days
+         *
+         * @param {Number} chunk Number of chunk
+         * @param {Object} after [Moment] Load days directly after this date
+         * @param {Number} addFrom Index of an element after which loaded days will be placed
+         * @returns {*}
+         */
+        fetchChunk: function(chunk, after, addFrom) {
+            var self = this;
+
+            return $_ajax({
+                url: this.url(),
+                data: {
+                    after: after.format(Day.formats.SERVER)
+                },
+                beforeSend: function() {
+                    self.setChunk(chunk, DayCollection.CHUNK_LOADING);
+                }
+            }).done(function(data) {
+                self.setChunk(chunk, DayCollection.CHUNK_LOADED);
+
+                _.each(data, function(item, i) {
+                    self.add(item, {
+                        at: addFrom + i
+                    });
+                });
+            }).fail(function() {
+                //
+            }).always(function() {
+                //
+            });
+        },
+        /**
+         * Check if loading is needed, compose loading and run fetchChunk()
+         *
+         * @param {Number} n Number of chunk
+         * @returns {*}
+         */
         loadChunk: function(n) {
             if (n < 1) {
                 return;
@@ -152,16 +202,16 @@ $(function() {
 
             if (n > 1 && !this.chunkIs(previous, DayCollection.CHUNK_LOADED)) {
                 loadingCount = DayCollection.CHUNK_SIZE * 2;
-                this.chunks[previous] = DayCollection.CHUNK_PENDING;
+
+                this.setChunk(previous, DayCollection.CHUNK_PENDING);
             }
 
             _.times(loadingCount, function() {
                 loadingDays += loadingTemplate;
             });
 
-            var $loading = $(loadingDays),
-                lastAt = this.lastOfChunk(previous),
-                lastOfChunk = this.at(lastAt),
+            var lastOfChunkIndex = this.lastOfChunk(previous),
+                lastOfChunk = this.at(lastOfChunkIndex),
                 after;
 
             if (lastOfChunk) { // Forward
@@ -171,30 +221,9 @@ $(function() {
                 after = lastOfChunk.get("date").clone().add(14, 'days');
             }
 
-            $_ajax({
-                url: "get14days",
-                data: {
-                    property: _.uniqueId(),
-                    after: after.format(Day.formats.SERVER)
-                },
-                beforeSend: function() {
-                    self.chunks[n] = DayCollection.CHUNK_LOADING;
+            lastOfChunk.view.$el.after(loadingDays);
 
-                    lastOfChunk.view.$el.after($loading);
-                }
-            }).done(function(data) {
-                self.chunks[n] = DayCollection.CHUNK_LOADED;
-
-                _.each(data, function(item, i) {
-                    self.add(item, {
-                        at: lastAt + i + 1
-                    });
-                });
-            }).fail(function() {
-                //
-            }).always(function() {
-                //
-            });
+            return this.fetchChunk(n, after, lastOfChunkIndex + 1);
         }
     }, {
         CHUNK_SIZE: 14,
@@ -207,6 +236,7 @@ $(function() {
         defaults: function() {
             return {
                 minNights: 1,
+                url: "",
                 days: []
             };
         }
@@ -227,12 +257,12 @@ $(function() {
             this.page = 0;
             this.container = options.container;
 
-            this.listenTo(this.model, 'day.mouseEnter', function() {
-                self.container.trigger('price.day.mouseenter', self);
+            this.listenTo(this.model, 'day.mouseEnter', function(day) {
+                self.container.trigger('price.day.mouseenter', day);
             });
 
-            this.listenTo(this.model, 'day.mouseLeave', function() {
-                self.container.trigger('price.day.mouseleave', self);
+            this.listenTo(this.model, 'day.mouseLeave', function(day) {
+                self.container.trigger('price.day.mouseleave', day);
             });
         },
         render: function() {
@@ -290,7 +320,8 @@ $(function() {
 
             this.model.days = new DayCollection(this.model.get("days"), {
                 container: this.pricesContainer,
-                widget: this.model
+                widget: this.model,
+                url: this.model.get("url")
             });
 
             return this;

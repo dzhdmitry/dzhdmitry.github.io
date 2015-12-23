@@ -139,7 +139,8 @@ $(function() {
 
             this.model.days = new DayCollection(this.model.get("days"), {
                 container: this.pricesContainer,
-                widget: this.model
+                widget: this.model,
+                url: this.model.get("url")
             });
 
             return this;

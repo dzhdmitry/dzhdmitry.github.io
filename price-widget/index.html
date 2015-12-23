@@ -130,8 +130,8 @@
             {type: "available", currency: "$", price: 205, discount: 15},
             {type: "available", currency: "$", price: 205, discount: 15},
 
-            {type: "poa",       currency: "$", price: 205, discount: 0},
-            {type: "poa",       currency: "$", price: 205, discount: 0},
+            {type: "sold",      currency: "$", price: 205, discount: 0},
+            {type: "sold",      currency: "$", price: 205, discount: 0},
             {type: "available", currency: "$", price: 205, discount: 0},
             {type: "available", currency: "$", price: 205, discount: 0},
             {type: "available", currency: "$", price: 205, discount: 15},
@@ -153,12 +153,14 @@
             });
 
             priceWidget = $w.priceWidget({
+                url: "/property/1/prices",
                 days: DATA
             });
 
             bookingPriceWidget = $w.bookingPriceWidget({
-                minNights: 3,
-                days: DATA
+                url: "/property/2/prices",
+                days: DATA,
+                minNights: 3
             });
 
             $w.on('prices.change', function(e, view) {
