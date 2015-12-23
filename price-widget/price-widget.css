@@ -23,8 +23,6 @@
   border-bottom-left-radius: 0;
 }
 .price-widget {
-  margin-left: 31px;
-  margin-right: 31px;
   border-radius: 8px;
 }
 .price-widget > .panel-body {
@@ -32,6 +30,21 @@
   padding: 0;
   overflow-x: hidden;
   border-radius: 4px;
+}
+.price-widget > .panel-footer {
+  border-bottom-left-radius: 7px;
+  border-bottom-right-radius: 7px;
+  padding: 0;
+}
+.price-widget > .panel-footer > .btn-group-justified > .btn {
+  padding: 4px 12px;
+  font-size: 12px;
+}
+.price-widget > .panel-footer > .btn-group-justified > .btn:first-child {
+  border-top-left-radius: 0;
+}
+.price-widget > .panel-footer > .btn-group-justified > .btn:last-child {
+  border-top-right-radius: 0;
 }
 .prices-container {
   width: 10000px;
@@ -77,7 +90,7 @@
 .panel.panel-day > .panel-body,
 .panel.panel-day > .panel-footer {
   background-color: transparent;
-  padding: 5px 3px;
+  padding: 5px 0;
 }
 .panel.panel-day > .panel-heading {
   font-size: 11px;
@@ -116,4 +129,10 @@
   font-size: 13px;
   color: #5d5d5d;
   text-align: center;
+}
+@media screen and (min-width: 768px) {
+  .price-widget {
+    margin-left: 31px;
+    margin-right: 31px;
+  }
 }

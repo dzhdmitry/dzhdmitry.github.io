@@ -124,12 +124,21 @@ $(function() {
     });
 
     var WidgetView = PriceWidget.AbstractWidgetView.extend({
+        initialize: function(options) {
+            var self = this;
+
+            WidgetView.__super__.initialize.call(this, options);
+
+            this.listenTo(this.model, 'change', function() {
+                self.container.trigger('prices.change', self);
+            });
+        },
         render: function() {
             WidgetView.__super__.render.call(this);
             this.$el.addClass("price-widget-booking");
 
             this.model.days = new DayCollection(this.model.get("days"), {
-                container: this.container,
+                container: this.pricesContainer,
                 widget: this.model
             });
 
@@ -148,13 +157,9 @@ $(function() {
      * @returns {$|jQuery}
      */
     $.fn.bookingPriceWidget = function(options) {
-        var container = this,
-            view = new WidgetView({model: new Widget(options)});
-
-        PriceWidget.bindEvents(view.model, this);
-
-        view.model.on('change', function() {
-            container.trigger('prices.change', view.model);
+        var view = new WidgetView({
+            model: new Widget(options),
+            container: this
         });
 
         return this.append(view.render().el);

@@ -87,14 +87,14 @@ $(function() {
 
             return !(type == "poa" || type == "sold");
         },
-        mouseEnter: function(e) {
+        mouseEnter: function() {
             if (this.popoverAllowed()) {
                 this.$el.popover('show');
             }
 
             this.getWidget().trigger('day.mouseEnter', this.model);
         },
-        mouseLeave: function(e) {
+        mouseLeave: function() {
             this.$el.popover('hide');
             this.getWidget().trigger('day.mouseLeave', this.model);
         }
@@ -198,22 +198,40 @@ $(function() {
         tagName: 'div',
         template: _.template($('#widget-template').html()),
         events: {
-            'click button.widget-action-backward': "backward",
-            'click button.widget-action-fast-backward': "fastBackward",
-            'click button.widget-action-forward': "forward",
-            'click button.widget-action-fast-forward': "fastForward"
+            'click a.widget-action-backward': "backward",
+            'click a.widget-action-fast-backward': "fastBackward",
+            'click a.widget-action-forward': "forward",
+            'click a.widget-action-fast-forward': "fastForward"
         },
         initialize: function(options) {
+            var self = this;
+
             this.page = 0;
+            this.container = options.container;
+
+            this.listenTo(this.model, 'day.mouseEnter', function() {
+                self.container.trigger('price.day.mouseenter', self);
+            });
+
+            this.listenTo(this.model, 'day.mouseLeave', function() {
+                self.container.trigger('price.day.mouseleave', self);
+            });
         },
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
 
-            this.container = this.$el.find('ul.prices-container');
+            this.pricesContainer = this.$el.find('ul.prices-container');
 
             return this;
         },
-        scroll: function(direction, steps, callback) {
+        getCurrentChunk: function() {
+            var oddPage = (this.page % 2 == 0) ? this.page : this.page - 1;
+
+            return oddPage / 2;
+        },
+        scroll: function(e, direction, steps, offset) {
+            e.preventDefault();
+
             if (direction == WidgetView.DIRECTION_LEFT) {
                 this.page -= steps;
             } else {
@@ -224,46 +242,28 @@ $(function() {
                 this.page = 0;
             }
 
-            var offset = WidgetView.DAY_WIDTH * DAYS_PER_PAGE * this.page;
+            var self = this,
+                containerOffset = WidgetView.DAY_WIDTH * DAYS_PER_PAGE * this.page;
 
-            this.container.animate({right: offset + "px"}, 'fast', callback);
-        },
-        getCurrentChunk: function() {
-            var oddPage = (this.page % 2 == 0) ? this.page : this.page - 1;
+            offset = offset || 0;
 
-            return oddPage / 2;
-        },
-        backward: function() {
-            var self = this;
-
-            // Go 1 step backward and load current chunk
-            this.scroll(WidgetView.DIRECTION_LEFT, 1, function() {
-                self.model.days.loadChunk(self.getCurrentChunk());
+            this.pricesContainer.animate({
+                right: containerOffset + "px"
+            }, 'fast', function() {
+                self.model.days.loadChunk(self.getCurrentChunk() + offset);
             });
         },
-        fastBackward: function() {
-            var self = this;
-
-            // Go 4 steps backward and load current chunk
-            this.scroll(WidgetView.DIRECTION_LEFT, 4, function() {
-                self.model.days.loadChunk(self.getCurrentChunk());
-            });
+        backward: function(e) {
+            this.scroll(e, WidgetView.DIRECTION_LEFT, 1);
         },
-        forward: function() {
-            var self = this;
-
-            // Go 1 step forward and load next chunk
-            this.scroll(WidgetView.DIRECTION_RIGHT, 1, function() {
-                self.model.days.loadChunk(self.getCurrentChunk() + 1);
-            });
+        fastBackward: function(e) {
+            this.scroll(e, WidgetView.DIRECTION_LEFT, 4);
         },
-        fastForward: function() {
-            var self = this;
-
-            // Go 4 steps forward and load current chunk
-            this.scroll(WidgetView.DIRECTION_RIGHT, 4, function() {
-                self.model.days.loadChunk(self.getCurrentChunk());
-            });
+        forward: function(e) {
+            this.scroll(e, WidgetView.DIRECTION_RIGHT, 1, 1);
+        },
+        fastForward: function(e) {
+            this.scroll(e, WidgetView.DIRECTION_RIGHT, 4);
         }
     }, {
         DAY_WIDTH: 57,
@@ -276,7 +276,7 @@ $(function() {
             WidgetView.__super__.render.call(this);
 
             this.model.days = new DayCollection(this.model.get("days"), {
-                container: this.container,
+                container: this.pricesContainer,
                 widget: this.model
             });
 
@@ -289,16 +289,7 @@ $(function() {
         DayView: DayView,
         DayCollection: DayCollection,
         Widget: Widget,
-        AbstractWidgetView: AbstractWidgetView,
-        bindEvents: function(widget, container) {
-            widget.on('day.mouseEnter', function() {
-                container.trigger('price.day.mouseenter', widget);
-            });
-
-            widget.on('day.mouseLeave', function() {
-                container.trigger('price.day.mouseleave', widget);
-            });
-        }
+        AbstractWidgetView: AbstractWidgetView
     };
 
     /**
@@ -312,9 +303,10 @@ $(function() {
      * @returns {$|jQuery}
      */
     $.fn.priceWidget = function(options) {
-        var view = new WidgetView({model: new Widget(options)});
-
-        PriceWidget.bindEvents(view.model, this);
+        var view = new WidgetView({
+            model: new Widget(options),
+            container: this
+        });
 
         return this.append(view.render().el);
     };

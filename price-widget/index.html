@@ -15,29 +15,49 @@
     </div>
 
     <script id="widget-template" type="text/html">
-        <div class="btn-group-vertical btn-group-left" role="group">
-            <button type="button" class="btn btn-primary widget-action-backward" title="Go back 1 week">
+        <div class="btn-group-vertical btn-group-left hidden-xs" role="group">
+            <a href="#" class="btn btn-primary widget-action-backward" title="Go back 1 week">
                 <span class="glyphicon glyphicon-step-backward"></span>
-            </button>
+            </a>
 
-            <button type="button" class="btn btn-primary widget-action-fast-backward" title="Go back 1 month">
+            <a href="#" class="btn btn-primary widget-action-fast-backward" title="Go back 1 month">
                 <span class="glyphicon glyphicon-fast-backward"></span>
-            </button>
+            </a>
         </div>
 
-        <div class="btn-group-vertical btn-group-right" role="group">
-            <button type="button" class="btn btn-primary widget-action-forward" title="Go back 1 week">
+        <div class="btn-group-vertical btn-group-right hidden-xs" role="group">
+            <a href="#" class="btn btn-primary widget-action-forward" title="Go back 1 week">
                 <span class="glyphicon glyphicon-step-forward"></span>
-            </button>
+            </a>
 
-            <button type="button" class="btn btn-primary widget-action-fast-forward" title="Go back 1 month">
+            <a href="#" class="btn btn-primary widget-action-fast-forward" title="Go back 1 month">
                 <span class="glyphicon glyphicon-fast-forward"></span>
-            </button>
+            </a>
         </div>
 
         <div class="panel panel-default price-widget">
             <div class="panel-body">
                 <ul class="prices-container"></ul>
+            </div>
+
+            <div class="panel-footer visible-xs">
+                <div class="btn-group btn-group-justified">
+                    <a href="#" class="btn btn-primary widget-action-fast-backward" title="Go back 1 month">
+                        <span class="glyphicon glyphicon-fast-backward"></span>
+                    </a>
+
+                    <a href="#" class="btn btn-primary widget-action-backward" title="Go back 1 week">
+                        <span class="glyphicon glyphicon-step-backward"></span>
+                    </a>
+
+                    <a href="#" class="btn btn-primary widget-action-forward" title="Go back 1 week">
+                        <span class="glyphicon glyphicon-step-forward"></span>
+                    </a>
+
+                    <a href="#" class="btn btn-primary widget-action-fast-forward" title="Go back 1 month">
+                        <span class="glyphicon glyphicon-fast-forward"></span>
+                    </a>
+                </div>
             </div>
         </div>
     </script>
