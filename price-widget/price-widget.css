@@ -108,3 +108,12 @@
   border-top: 1px solid #eee;
   margin-bottom: -4px;
 }
+.popover-day.fade.in {
+  opacity: 0.9;
+}
+.popover-day .popover-content {
+  padding: 10px 20px;
+  font-size: 13px;
+  color: #5d5d5d;
+  text-align: center;
+}

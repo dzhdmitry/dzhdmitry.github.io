@@ -76,6 +76,20 @@
         <li class="panel panel-day day-loading"></li>
     </script>
 
+    <script id="day-popover-template" type="text/html">
+        <div class="popover popover-day" role="tooltip">
+            <div class="arrow"></div>
+
+            <div class="popover-content"></div>
+        </div>
+    </script>
+
+    <script id="day-popover-content-template" type="text/html">
+        <%= day %> <%= month %> <%= year %>
+        <br>
+        <%= currency %><%= price %> per night, min <%= minNights %> night<% if (minNights != 1) { %>s<% } %>
+    </script>
+
     <script src="../jquery-2.1.4.min.js" type="text/javascript"></script>
     <script src="../js/bootstrap.min.js" type="text/javascript"></script>
     <script src="../js/underscore-min.js" type="text/javascript"></script>
@@ -112,12 +126,20 @@
             });
 
             bookingPriceWidget = $w.bookingPriceWidget({
-                minDays: 3,
+                minNights: 3,
                 days: DATA
             });
 
-            $w.on('booking.change', function(e, view) {
-                console.log('booking.change', view);
+            $w.on('prices.change', function(e, view) {
+                console.log('prices.change', view);
+            });
+
+            $w.on('price.day.mouseenter', function(e, view) {
+                console.log('price.day.mouseenter', view);
+            });
+
+            $w.on('price.day.mouseleave', function(e, view) {
+                console.log('price.day.mouseleave', view);
             });
         });
     </script>

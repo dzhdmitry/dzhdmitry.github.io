@@ -2,7 +2,9 @@ var PriceWidget = {};
 
 $(function() {
     var DAYS_PER_PAGE = 7,
-        loadingTemplate = _.template($('#day-loading-template').html())();
+        loadingTemplate = _.template($('#day-loading-template').html())(),
+        dayPopoverTemplate = $('#day-popover-template').html(),
+        dayPopoverContentTemplate = _.template($('#day-popover-content-template').html());
 
     var Day = Backbone.Model.extend({
         defaults: function() {
@@ -58,6 +60,21 @@ $(function() {
             this.listenTo(this.model, 'destroy', this.remove);
 
             this.model.view = this;
+
+            var data = _.extend({}, this.model.toJSON(), {
+                minNights: this.getWidget().get("minNights")
+            });
+
+            this.$el.popover({
+                content: dayPopoverContentTemplate(data),
+                placement: "top",
+                container: "body",
+                html: true,
+                template: dayPopoverTemplate
+            });
+        },
+        getWidget: function() {
+            return this.model.collection.widget;
         },
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
@@ -65,11 +82,21 @@ $(function() {
 
             return this;
         },
+        popoverAllowed: function() {
+            var type = this.model.get("type");
+
+            return !(type == "poa" || type == "sold");
+        },
         mouseEnter: function(e) {
-            //console.log("mouseenter", e, this);
+            if (this.popoverAllowed()) {
+                this.$el.popover('show');
+            }
+
+            this.getWidget().trigger('day.mouseEnter', this.model);
         },
         mouseLeave: function(e) {
-            //console.log("mouseleave", e, this);
+            this.$el.popover('hide');
+            this.getWidget().trigger('day.mouseLeave', this.model);
         }
     });
 
@@ -91,6 +118,10 @@ $(function() {
             return _.has(this.chunks, n) && (this.chunks[n] == status);
         },
         loadChunk: function(n) {
+            if (n < 1) {
+                return;
+            }
+
             var self = this,
                 previous = n - 1,
                 loadingDays = "",
@@ -157,6 +188,7 @@ $(function() {
     var Widget = Backbone.Model.extend({
         defaults: function() {
             return {
+                minNights: 1,
                 days: []
             };
         }
@@ -202,10 +234,20 @@ $(function() {
             return oddPage / 2;
         },
         backward: function() {
-            this.scroll(WidgetView.DIRECTION_LEFT, 1);
+            var self = this;
+
+            // Go 1 step backward and load current chunk
+            this.scroll(WidgetView.DIRECTION_LEFT, 1, function() {
+                self.model.days.loadChunk(self.getCurrentChunk());
+            });
         },
         fastBackward: function() {
-            this.scroll(WidgetView.DIRECTION_LEFT, 4);
+            var self = this;
+
+            // Go 4 steps backward and load current chunk
+            this.scroll(WidgetView.DIRECTION_LEFT, 4, function() {
+                self.model.days.loadChunk(self.getCurrentChunk());
+            });
         },
         forward: function() {
             var self = this;
@@ -247,17 +289,32 @@ $(function() {
         DayView: DayView,
         DayCollection: DayCollection,
         Widget: Widget,
-        AbstractWidgetView: AbstractWidgetView
+        AbstractWidgetView: AbstractWidgetView,
+        bindEvents: function(widget, container) {
+            widget.on('day.mouseEnter', function() {
+                container.trigger('price.day.mouseenter', widget);
+            });
+
+            widget.on('day.mouseLeave', function() {
+                container.trigger('price.day.mouseleave', widget);
+            });
+        }
     };
 
     /**
      * Price Widget
+     *
+     * Events:
+     *   `price.day.mouseenter` (event, day) Triggers on day mouseenter
+     *   `price.day.mouseleave` (event, day) Triggers on day mouseleave
      *
      * @param {Object} options for Widget model. See Widget.defaults()
      * @returns {$|jQuery}
      */
     $.fn.priceWidget = function(options) {
         var view = new WidgetView({model: new Widget(options)});
+
+        PriceWidget.bindEvents(view.model, this);
 
         return this.append(view.render().el);
     };

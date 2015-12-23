@@ -109,7 +109,7 @@ $(function() {
         model: Day,
         selectionChanged: function() {
             var checked = this.where({isChecked: true}),
-                isActive = checked.length >= this.widget.get("minDays");
+                isActive = checked.length >= this.widget.get("minNights");
 
             this.each(function(day) {
                 day.set('isActive', isActive ? day.get('isChecked') : false);
@@ -140,6 +140,10 @@ $(function() {
     /**
      * Booking Price Widget
      *
+     * Events:
+     *   [PriceWidget events]
+     *   `prices.change` (event, widget) Triggers when prices selection changed
+     *
      * @param {Object} options for Widget model. See Widget.defaults()
      * @returns {$|jQuery}
      */
@@ -147,8 +151,10 @@ $(function() {
         var container = this,
             view = new WidgetView({model: new Widget(options)});
 
+        PriceWidget.bindEvents(view.model, this);
+
         view.model.on('change', function() {
-            container.trigger('booking.change', view);
+            container.trigger('prices.change', view.model);
         });
 
         return this.append(view.render().el);
