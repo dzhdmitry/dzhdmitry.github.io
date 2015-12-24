@@ -11,26 +11,28 @@
     <div class="container">
         <h1>Price widget</h1>
 
-        <div id="widgets"></div>
+        <div id="widget1"></div>
+
+        <div id="widget2"></div>
     </div>
 
     <script id="widget-template" type="text/html">
         <div class="btn-group-vertical btn-group-left hidden-xs" role="group">
-            <a href="#" class="btn btn-primary widget-action-backward" title="Go back 1 week">
+            <a href="#" class="btn btn-primary widget-action widget-action-backward" title="Go back 1 week">
                 <span class="glyphicon glyphicon-step-backward"></span>
             </a>
 
-            <a href="#" class="btn btn-primary widget-action-fast-backward" title="Go back 1 month">
+            <a href="#" class="btn btn-primary widget-action widget-action-fast-backward" title="Go back 1 month">
                 <span class="glyphicon glyphicon-fast-backward"></span>
             </a>
         </div>
 
         <div class="btn-group-vertical btn-group-right hidden-xs" role="group">
-            <a href="#" class="btn btn-primary widget-action-forward" title="Go back 1 week">
+            <a href="#" class="btn btn-primary widget-action widget-action-forward" title="Go forward 1 week">
                 <span class="glyphicon glyphicon-step-forward"></span>
             </a>
 
-            <a href="#" class="btn btn-primary widget-action-fast-forward" title="Go back 1 month">
+            <a href="#" class="btn btn-primary widget-action widget-action-fast-forward" title="Go forward 1 month">
                 <span class="glyphicon glyphicon-fast-forward"></span>
             </a>
         </div>
@@ -42,19 +44,19 @@
 
             <div class="panel-footer visible-xs">
                 <div class="btn-group btn-group-justified">
-                    <a href="#" class="btn btn-primary widget-action-fast-backward" title="Go back 1 month">
+                    <a href="#" class="btn btn-primary widget-action widget-action-fast-backward" title="Go back 1 month">
                         <span class="glyphicon glyphicon-fast-backward"></span>
                     </a>
 
-                    <a href="#" class="btn btn-primary widget-action-backward" title="Go back 1 week">
+                    <a href="#" class="btn btn-primary widget-action widget-action-backward" title="Go back 1 week">
                         <span class="glyphicon glyphicon-step-backward"></span>
                     </a>
 
-                    <a href="#" class="btn btn-primary widget-action-forward" title="Go back 1 week">
+                    <a href="#" class="btn btn-primary widget-action widget-action-forward" title="Go forward 1 week">
                         <span class="glyphicon glyphicon-step-forward"></span>
                     </a>
 
-                    <a href="#" class="btn btn-primary widget-action-fast-forward" title="Go back 1 month">
+                    <a href="#" class="btn btn-primary widget-action widget-action-fast-forward" title="Go forward 1 month">
                         <span class="glyphicon glyphicon-fast-forward"></span>
                     </a>
                 </div>
@@ -143,7 +145,8 @@
 
         $(function() {
             var FORMAT_SERVER = "MM/DD/YYYY",
-                $w = $('#widgets'),
+                $w1 = $('#widget1'),
+                $w2 = $('#widget2'),
                 day = moment("11/30/2015", FORMAT_SERVER);
 
             DATA = _.map(DATA, function(item) {
@@ -154,26 +157,26 @@
                 });
             });
 
-            priceWidget = $w.priceWidget({
+            priceWidget = $w1.priceWidget({
                 url: "/property/1/prices",
                 days: DATA
             });
 
-            bookingPriceWidget = $w.bookingPriceWidget({
+            bookingPriceWidget = $w2.bookingPriceWidget({
                 url: "/property/2/prices",
                 days: DATA,
                 minNights: 3
             });
 
-            $w.on('prices.change', function(e, view) {
+            $w2.on('prices.change', function(e, view) {
                 //console.log('prices.change', view);
             });
 
-            $w.on('price.day.mouseenter', function(e, view) {
+            $w1.on('price.day.mouseenter', function(e, view) {
                 //console.log('price.day.mouseenter', view);
             });
 
-            $w.on('price.day.mouseleave', function(e, view) {
+            $w1.on('price.day.mouseleave', function(e, view) {
                 //console.log('price.day.mouseleave', view);
             });
         });

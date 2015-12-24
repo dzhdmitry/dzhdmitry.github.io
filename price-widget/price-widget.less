@@ -8,14 +8,14 @@
 .btn-group-vertical {
     margin-top: 12px;
 
-    > .btn {
+    > .btn.widget-action {
         padding: 8px 8px;
     }
 
     &.btn-group-left {
         float: left;
 
-        > .btn {
+        > .btn.widget-action {
             &:first-child {
                 border-top-right-radius: 0;
             }
@@ -29,7 +29,7 @@
     &.btn-group-right {
         float: right;
 
-        > .btn {
+        > .btn.widget-action {
             &:first-child {
                 border-top-left-radius: 0;
             }
@@ -43,6 +43,7 @@
 
 .price-widget {
     @widget-border-radius: 8px;
+    @widget-control-width: 32px;
 
     border-radius: @widget-border-radius;
 
@@ -59,7 +60,7 @@
         padding: 0;
 
         > .btn-group-justified {
-            > .btn {
+            > .btn.widget-action {
                 padding: 4px 12px;
                 font-size: 12px;
 
@@ -72,6 +73,11 @@
                 }
             }
         }
+    }
+
+    @media screen and (min-width: 768px) {
+        margin-left: @widget-control-width - 1;
+        margin-right: @widget-control-width - 1;
     }
 }
 
@@ -114,7 +120,7 @@
 
     &.day-loading {
         background-color: transparent;
-        background-image: url(http://aa-rebuild/bundles/app/images/loading-green.gif);
+        background-image: url(loading-green.gif);
         background-size: contain;
         background-repeat: no-repeat;
         background-position-y: 50%;
@@ -176,14 +182,5 @@
         font-size: 13px;
         color: #5d5d5d;
         text-align: center;
-    }
-}
-
-@media screen and (min-width: 768px) {
-    @widget-control-width: 32px;
-
-    .price-widget {
-        margin-left: @widget-control-width - 1;
-        margin-right: @widget-control-width - 1;
     }
 }

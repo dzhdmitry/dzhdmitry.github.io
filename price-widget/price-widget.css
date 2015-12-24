@@ -1,25 +1,25 @@
 .btn-group-vertical {
   margin-top: 12px;
 }
-.btn-group-vertical > .btn {
+.btn-group-vertical > .btn.widget-action {
   padding: 8px 8px;
 }
 .btn-group-vertical.btn-group-left {
   float: left;
 }
-.btn-group-vertical.btn-group-left > .btn:first-child {
+.btn-group-vertical.btn-group-left > .btn.widget-action:first-child {
   border-top-right-radius: 0;
 }
-.btn-group-vertical.btn-group-left > .btn:last-child {
+.btn-group-vertical.btn-group-left > .btn.widget-action:last-child {
   border-bottom-right-radius: 0;
 }
 .btn-group-vertical.btn-group-right {
   float: right;
 }
-.btn-group-vertical.btn-group-right > .btn:first-child {
+.btn-group-vertical.btn-group-right > .btn.widget-action:first-child {
   border-top-left-radius: 0;
 }
-.btn-group-vertical.btn-group-right > .btn:last-child {
+.btn-group-vertical.btn-group-right > .btn.widget-action:last-child {
   border-bottom-left-radius: 0;
 }
 .price-widget {
@@ -36,15 +36,21 @@
   border-bottom-right-radius: 7px;
   padding: 0;
 }
-.price-widget > .panel-footer > .btn-group-justified > .btn {
+.price-widget > .panel-footer > .btn-group-justified > .btn.widget-action {
   padding: 4px 12px;
   font-size: 12px;
 }
-.price-widget > .panel-footer > .btn-group-justified > .btn:first-child {
+.price-widget > .panel-footer > .btn-group-justified > .btn.widget-action:first-child {
   border-top-left-radius: 0;
 }
-.price-widget > .panel-footer > .btn-group-justified > .btn:last-child {
+.price-widget > .panel-footer > .btn-group-justified > .btn.widget-action:last-child {
   border-top-right-radius: 0;
+}
+@media screen and (min-width: 768px) {
+  .price-widget {
+    margin-left: 31px;
+    margin-right: 31px;
+  }
 }
 .prices-container {
   width: 20000px;
@@ -78,7 +84,7 @@
 }
 .panel.panel-day.day-loading {
   background-color: transparent;
-  background-image: url(http://aa-rebuild/bundles/app/images/loading-green.gif);
+  background-image: url(loading-green.gif);
   background-size: contain;
   background-repeat: no-repeat;
   background-position-y: 50%;
@@ -129,10 +135,4 @@
   font-size: 13px;
   color: #5d5d5d;
   text-align: center;
-}
-@media screen and (min-width: 768px) {
-  .price-widget {
-    margin-left: 31px;
-    margin-right: 31px;
-  }
 }

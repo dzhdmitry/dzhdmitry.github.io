@@ -233,6 +233,10 @@ $(function() {
                 throw new Error("Days amount must be multiple to " + DAYS_PER_PAGE + ". Current is " + length);
             }
 
+            if (length == 0) {
+                throw new Error("Widget must be initialized with at least " + DAYS_PER_PAGE + " days ");
+            }
+
             this.pages = new PagesInfo(length / DAYS_PER_PAGE);
         },
         checkLength: function(models) {
@@ -246,17 +250,17 @@ $(function() {
          * @returns {Boolean} Adding was successful
          */
         addPage: function(days, at) {
-            if (this.checkLength(days)) {
-                _.each(days, function(day, i) {
-                    this.add(day, {
-                        at: at + i
-                    });
-                }, this);
-
-                return true;
-            } else {
+            if (!this.checkLength(days)) {
                 return false;
             }
+
+            _.each(days, function(day, i) {
+                this.add(day, {
+                    at: at + i
+                });
+            }, this);
+
+            return true;
         },
         lastDayOfPage: function(page) {
             return ((page + 1) * this.widget.getDaysPerPage()) - 1;
@@ -303,16 +307,16 @@ $(function() {
                 },
                 beforeSend: function() {
                     self.pages.set(pages, DayCollection.PAGE_LOADING);
+                    self.widget.toggleControls(true);
                 }
             }).done(function(data) {
                 if (self.addPage(data, addFrom)) {
                     self.pages.set(pages, DayCollection.PAGE_LOADED);
-                    console.log(self.pages.pages);
                 }
             }).fail(function() {
                 //
             }).always(function() {
-                //
+                self.widget.toggleControls(false);
             });
         },
         /**
@@ -417,6 +421,9 @@ $(function() {
         getDaysPerPage: function() {
             return this.model.get("DAYS_PER_PAGE");
         },
+        toggleControls: function(disable) {
+            this.$('a.widget-action').toggleClass("disabled", disable);
+        },
         /**
          * Move prices container <steps> from current position
          *
@@ -473,25 +480,49 @@ $(function() {
         DayView: DayView,
         DayCollection: DayCollection,
         Widget: Widget,
-        AbstractWidgetView: AbstractWidgetView
+        AbstractWidgetView: AbstractWidgetView,
+        plugin: {
+            initialize: function(options) {
+                var view = new WidgetView({
+                    model: new Widget(options),
+                    container: this
+                });
+
+                this.html(view.render().el).data("priceWidget", view);
+
+                return this;
+            },
+            widget: function() {
+                return this.data("priceWidget");
+            },
+            days: function() {
+                return this.data("priceWidget").model.days;
+            }
+        }
     };
 
     /**
      * Price Widget
      *
+     * Methods:
+     *   `widget` $(el).priceWidget("widget") returns current widget
+     *
      * Events:
      *   `price.day.mouseenter` (event, dayView) Triggers on day mouseenter
      *   `price.day.mouseleave` (event, dayView) Triggers on day mouseleave
      *
-     * @param {Object} options for Widget model. See Widget.defaults()
+     * @param {Object|String} method Plugin method or options for Widget model. See Widget.defaults()
      * @returns {$|jQuery}
      */
-    $.fn.priceWidget = function(options) {
-        var view = new WidgetView({
-            model: new Widget(options),
-            container: this
-        });
+    $.fn.priceWidget = function(method) {
+        var parameters = _.toArray(arguments);
 
-        return this.append(view.render().el);
+        if (_.has(PriceWidget.plugin, method)) {
+            return PriceWidget.plugin[method].apply(this, parameters.slice(1));
+        } else if (_.isObject(method)) {
+            return PriceWidget.plugin.initialize.apply(this, parameters);
+        } else {
+            $.error("Invalid options for $.fn.priceWidget");
+        }
     };
 });

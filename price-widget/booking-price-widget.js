@@ -145,22 +145,41 @@ $(function() {
         }
     });
 
+    var plugin = _.extend({}, PriceWidget.plugin, {
+        initialize: function(options) {
+            var view = new WidgetView({
+                model: new Widget(options),
+                container: this
+            });
+
+            this.html(view.render().el).data("priceWidget", view);
+
+            return this;
+        }
+    });
+
     /**
      * Booking Price Widget
+     *
+     * Methods:
+     *   `widget` $(el).bookingPriceWidget("widget") returns current widget
      *
      * Events:
      *   [PriceWidget events]
      *   `prices.change` (event, widgetView) Triggers when prices selection changed
      *
-     * @param {Object} options for Widget model. See Widget.defaults()
+     * @param {Object|String} method Plugin method or options for Widget model. See Widget.defaults()
      * @returns {$|jQuery}
      */
-    $.fn.bookingPriceWidget = function(options) {
-        var view = new WidgetView({
-            model: new Widget(options),
-            container: this
-        });
+    $.fn.bookingPriceWidget = function(method) {
+        var parameters = _.toArray(arguments);
 
-        return this.append(view.render().el);
+        if (_.has(plugin, method)) {
+            return plugin[method].apply(this, parameters.slice(1));
+        } else if (_.isObject(method)) {
+            return plugin.initialize.apply(this, parameters);
+        } else {
+            $.error("Invalid options for $.fn.bookingPriceWidget");
+        }
     };
 });
