@@ -3,6 +3,7 @@
 }
 .btn-group-vertical > .btn.widget-action {
   padding: 8px 8px;
+  font-size: 12px;
 }
 .btn-group-vertical.btn-group-left {
   float: left;
@@ -22,11 +23,66 @@
 .btn-group-vertical.btn-group-right > .btn.widget-action:last-child {
   border-bottom-left-radius: 0;
 }
+.price-widget-container {
+  height: 122px;
+}
+.price-widget-container.price-widget-loading {
+  border-radius: 10px;
+  background-color: #ddd;
+}
+.price-widget-container.price-widget-loading:before {
+  content: "Loading prices...";
+  color: #555;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100px;
+  position: relative;
+  top: 38px;
+}
+.price-widget-container.price-widget-booking {
+  height: 146px;
+}
+.price-widget-container.price-widget-booking .btn-group-vertical {
+  margin-top: 24px;
+}
+.price-widget-container.price-widget-booking .day-discount {
+  margin-bottom: 5px;
+}
+.price-widget-container .btn.widget-action {
+  background-image: -webkit-linear-gradient(top, #4095b5 0%, #307088 100%);
+  background-image: -o-linear-gradient(top, #4095b5 0%, #307088 100%);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#4095b5), to(#307088));
+  background-image: linear-gradient(to bottom, #4095b5 0%, #307088 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff4095b5', endColorstr='#ff307088', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+  background-repeat: repeat-x;
+  color: white;
+  border: 1px solid #4095b5;
+}
+.price-widget-container .btn.widget-action:hover {
+  background-image: -webkit-linear-gradient(top, #307088 0%, #204b5b 100%);
+  background-image: -o-linear-gradient(top, #307088 0%, #204b5b 100%);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#307088), to(#204b5b));
+  background-image: linear-gradient(to bottom, #307088 0%, #204b5b 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff307088', endColorstr='#ff204b5b', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+  background-repeat: repeat-x;
+}
+@media screen and (min-width: 768px) {
+  .price-widget-container {
+    height: 94px;
+  }
+  .price-widget-container.price-widget-booking {
+    height: 118px;
+  }
+}
 .price-widget {
   border-radius: 8px;
+  margin-bottom: 0;
 }
 .price-widget > .panel-body {
-  margin: 5px;
+  margin: 4px;
   padding: 0;
   overflow-x: hidden;
   border-radius: 4px;
@@ -48,22 +104,16 @@
 }
 @media screen and (min-width: 768px) {
   .price-widget {
-    margin-left: 31px;
-    margin-right: 31px;
+    margin-left: 29px;
+    margin-right: 29px;
   }
 }
 .prices-container {
-  width: 20000px;
+  width: 1596px;
   padding: 0;
   margin: 0;
   overflow-y: auto;
   position: relative;
-}
-.price-widget-booking .btn-group-vertical {
-  margin-top: 24px;
-}
-.price-widget-booking .day-discount {
-  margin-bottom: 5px;
 }
 .panel.panel-day {
   border: 0;
@@ -75,6 +125,7 @@
   max-width: 55px;
   list-style: none;
   cursor: pointer;
+  white-space: nowrap;
 }
 .panel.panel-day:hover {
   background-color: #e3e3e4;
@@ -88,7 +139,7 @@
   background-size: contain;
   background-repeat: no-repeat;
   background-position-y: 50%;
-  height: 85px;
+  height: 80px;
   cursor: inherit;
   box-shadow: none;
 }
@@ -105,34 +156,59 @@
 }
 .panel.panel-day > .panel-body {
   font-size: 13px;
-  font-weight: bold;
+  line-height: 18px;
   color: white;
 }
 .panel.panel-day > .panel-body.day-available {
-  background-color: #59a1bf;
+  background-image: -webkit-linear-gradient(top, #4095b5 0%, #307088 100%);
+  background-image: -o-linear-gradient(top, #4095b5 0%, #307088 100%);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#4095b5), to(#307088));
+  background-image: linear-gradient(to bottom, #4095b5 0%, #307088 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff4095b5', endColorstr='#ff307088', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+  background-repeat: repeat-x;
 }
 .panel.panel-day > .panel-body.day-active {
-  background-color: #61bc5b;
+  background-image: -webkit-linear-gradient(top, #5cb140 0%, #458430 100%);
+  background-image: -o-linear-gradient(top, #5cb140 0%, #458430 100%);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#5cb140), to(#458430));
+  background-image: linear-gradient(to bottom, #5cb140 0%, #458430 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff5cb140', endColorstr='#ff458430', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+  background-repeat: repeat-x;
 }
 .panel.panel-day > .panel-body.day-poa {
-  background-color: #d39106;
+  background-image: -webkit-linear-gradient(top, #f0ad4e 0%, #eb9316 100%);
+  background-image: -o-linear-gradient(top, #f0ad4e 0%, #eb9316 100%);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#f0ad4e), to(#eb9316));
+  background-image: linear-gradient(to bottom, #f0ad4e 0%, #eb9316 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff0ad4e', endColorstr='#ffeb9316', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+  background-repeat: repeat-x;
 }
 .panel.panel-day > .panel-body.day-sold {
-  background-color: #d86e6e;
+  background-image: -webkit-linear-gradient(top, #d35451 0%, #b8322f 100%);
+  background-image: -o-linear-gradient(top, #d35451 0%, #b8322f 100%);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#d35451), to(#b8322f));
+  background-image: linear-gradient(to bottom, #d35451 0%, #b8322f 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffd35451', endColorstr='#ffb8322f', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+  background-repeat: repeat-x;
 }
 .panel.panel-day > .panel-footer {
   font-size: 12px;
+  line-height: 12px;
 }
 .panel.panel-day .day-booking {
   border-top: 1px solid #eee;
   margin-bottom: -4px;
 }
 .popover-day.fade.in {
-  opacity: 0.9;
+  opacity: 0.95;
 }
 .popover-day .popover-content {
   padding: 10px 20px;
-  font-size: 13px;
+  font-size: 12px;
   color: #5d5d5d;
   text-align: center;
 }

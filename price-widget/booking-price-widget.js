@@ -135,7 +135,6 @@ $(function() {
         },
         render: function() {
             WidgetView.__super__.render.call(this);
-            this.$el.addClass("price-widget-booking");
 
             this.model.days = new DayCollection(this.model.get("days"), {
                 widget: this
@@ -152,9 +151,7 @@ $(function() {
                 container: this
             });
 
-            this.html(view.render().el).data("priceWidget", view);
-
-            return this;
+            return PriceWidget.insertPlugin(this, view);
         }
     });
 

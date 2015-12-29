@@ -1,15 +1,35 @@
-@day-width: 55px;
-@day-vertical-margin: 5px;
+@color-primary: #4095b5;
+@color-success: #5cb140;
+@color-warning: #f0ad4e;
+@color-danger: #d35451;
 
-@color-primary: #59a1bf;
+@day-width: 55px;
+@day-outer-width: 57px;
+@day-vertical-margin: 5px;
+@initial-days-amount: 28;
+
 @day-background: #d6d6d7;
 @day-background-hover: lighten(@day-background, 5%);
+
+.background-gradient(@top, @bottom: darken(@top, 12%)) {
+    @msTop: argb(@top);
+    @msBottom: argb(@bottom);
+
+    background-image: -webkit-linear-gradient(top, @top 0%, @bottom 100%);
+    background-image:      -o-linear-gradient(top, @top 0%, @bottom 100%);
+    background-image: -webkit-gradient(linear, left top, left bottom, from(@top), to(@bottom));
+    background-image:         linear-gradient(to bottom, @top 0%, @bottom 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='@{msTop}', endColorstr='@{msBottom}', GradientType=0);
+    filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+    background-repeat: repeat-x;
+}
 
 .btn-group-vertical {
     margin-top: 12px;
 
     > .btn.widget-action {
         padding: 8px 8px;
+        font-size: 12px;
     }
 
     &.btn-group-left {
@@ -41,14 +61,67 @@
     }
 }
 
+@screen-sm-min: 768px;
+
+.price-widget-container {
+    height: 122px;
+
+    &.price-widget-loading {
+        border-radius: 10px;
+        background-color: #ddd;
+
+        &:before {
+            content: "Loading prices...";
+            color: #555;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 100px;
+            position: relative;
+            top: 38px;
+        }
+    }
+
+    &.price-widget-booking {
+        height: 146px;
+
+        .btn-group-vertical {
+            margin-top: 24px;
+        }
+
+        .day-discount {
+            margin-bottom: @day-vertical-margin;
+        }
+    }
+
+    .btn.widget-action {
+        .background-gradient(@color-primary);
+        color: white;
+        border: 1px solid @color-primary;
+
+        &:hover {
+            .background-gradient(darken(@color-primary, 12%));
+        }
+    }
+
+    @media screen and (min-width: @screen-sm-min) {
+        height: 94px;
+
+        &.price-widget-booking {
+            height: 118px;
+        }
+    }
+}
+
 .price-widget {
     @widget-border-radius: 8px;
-    @widget-control-width: 32px;
+    @widget-control-width: 30px;
 
     border-radius: @widget-border-radius;
+    margin-bottom: 0;
 
     > .panel-body {
-        margin: 5px;
+        margin: 4px;
         padding: 0;
         overflow-x: hidden;
         border-radius: 4px;
@@ -75,40 +148,31 @@
         }
     }
 
-    @media screen and (min-width: 768px) {
+    @media screen and (min-width: @screen-sm-min) {
         margin-left: @widget-control-width - 1;
         margin-right: @widget-control-width - 1;
     }
 }
 
 .prices-container {
-    width: 20000px;
+    width: @day-outer-width * @initial-days-amount;
     padding: 0;
     margin: 0;
     overflow-y: auto;
     position: relative;
 }
 
-.price-widget-booking {
-    .btn-group-vertical {
-        margin-top: 24px;
-    }
-
-    .day-discount {
-        margin-bottom: @day-vertical-margin;
-    }
-}
-
 .panel.panel-day {
     border: 0;
     float: left;
-    margin: 0 2px 0 0;
+    margin: 0 @day-outer-width - @day-width 0 0;
     text-align: center;
     background-color: @day-background;
     width: @day-width;
     max-width: @day-width;
     list-style: none;
     cursor: pointer;
+    white-space: nowrap;
 
     &:hover {
         background-color: @day-background-hover;
@@ -124,7 +188,7 @@
         background-size: contain;
         background-repeat: no-repeat;
         background-position-y: 50%;
-        height: 85px;
+        height: 80px;
         cursor: inherit;
         box-shadow: none;
     }
@@ -142,28 +206,29 @@
 
     > .panel-body {
         font-size: 13px;
-        font-weight: bold;
+        line-height: 18px;
         color: white;
 
         &.day-available {
-            background-color: @color-primary;
+            .background-gradient(@color-primary);
         }
 
         &.day-active {
-            background-color: #61bc5b;
+            .background-gradient(@color-success);
         }
 
         &.day-poa {
-            background-color: #d39106;
+            .background-gradient(@color-warning);
         }
 
         &.day-sold {
-            background-color: #d86e6e;
+            .background-gradient(@color-danger);
         }
     }
 
     > .panel-footer {
         font-size: 12px;
+        line-height: 12px;
     }
 
     .day-booking {
@@ -174,12 +239,12 @@
 
 .popover-day {
     &.fade.in {
-        opacity: 0.9;
+        opacity: 0.95;
     }
 
     .popover-content {
         padding: 10px 20px;
-        font-size: 13px;
+        font-size: 12px;
         color: #5d5d5d;
         text-align: center;
     }

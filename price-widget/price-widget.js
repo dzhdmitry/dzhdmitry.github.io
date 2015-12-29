@@ -5,13 +5,20 @@ $(function() {
         throw new Error("PriceWidget requires moment.js");
     }
 
-    var loadingTemplate = _.template($('#day-loading-template').html()),
+    var DAY_LOADING_CLASS = "day-loading",
+        renderLOADING = _.template($('#day-loading-template').html()),
         dayPopoverTemplate = $('#day-popover-template').html(),
-        dayPopoverContentTemplate = _.template($('#day-popover-content-template').html());
+        renderPopoverContent = _.template($('#day-popover-content-template').html());
 
     var PagesInfo = function(pages) {
         this.pages = {};
 
+        /**
+         * Set status to given pages
+         *
+         * @param {Array|Number} page_s
+         * @param {String} status
+         */
         this.set = function(page_s, status) {
             if (_.isArray(page_s)) {
                 _.each(page_s, function(page) {
@@ -41,8 +48,8 @@ $(function() {
         /**
          * Get indexes of pages needed to load
          *
-         * @param {Number} page index of current page
-         * @returns {Array} with maximum 2 indexes
+         * @param {Number} page Index of current page
+         * @returns {Array} with MAX_LOADING_PAGES indexes
          */
         this.getRequired = function(page) {
             var MAX_LOADING_PAGES = 3,
@@ -137,15 +144,25 @@ $(function() {
                 el = view.render().el;
 
             if (_.has(options, "at")) {
-                var $replacement = container.children().eq(options.at);
+                // Recognizing li.day-loading element and replace by view
+                var prev = this.collection.at(options.at - 1),
+                    diff = this.get("date").diff(prev.get("date")),
+                    duration = moment.duration(diff).get("d"),
+                    $replacement = prev.view.$el.nextAll().eq(duration - 1);
 
-                if ($replacement.hasClass("day-loading")) {
+                if ($replacement.hasClass(DAY_LOADING_CLASS)) {
                     $replacement.replaceWith(el);
                 }
             } else {
                 container.append(el);
             }
         },
+        /**
+         * Get date representation according to given format
+         *
+         * @param {String} format Compatible to Moment.js (http://momentjs.com/docs/#/displaying/format/)
+         * @returns {String}
+         */
         getDate: function(format) {
             format = format || Day.formats.SERVER;
 
@@ -171,18 +188,7 @@ $(function() {
             this.listenTo(this.model, 'destroy', this.remove);
 
             this.model.view = this;
-
-            var data = _.extend({}, this.model.toJSON(), {
-                minNights: this.getWidget().model.get("minNights")
-            });
-
-            this.$el.popover({
-                content: dayPopoverContentTemplate(data),
-                placement: "top",
-                container: "body",
-                html: true,
-                template: dayPopoverTemplate
-            });
+            this.popover = false;
         },
         /**
          * Get instance of Widget containing this day
@@ -195,6 +201,7 @@ $(function() {
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
             this.$el.addClass("panel panel-day");
+            this.$el.attr("data-d", this.model.get("date_POPOVER"));
 
             return this;
         },
@@ -203,9 +210,31 @@ $(function() {
 
             return !(type == "poa" || type == "sold");
         },
+        /**
+         * Initialize (if needed) and show day's popover
+         */
+        showPopover: function() {
+            if (!this.popover) {
+                var data = _.extend({}, this.model.toJSON(), {
+                    minNights: this.getWidget().model.get("minNights")
+                });
+
+                this.$el.popover({
+                    content: renderPopoverContent(data),
+                    placement: "top",
+                    container: "body",
+                    html: true,
+                    template: dayPopoverTemplate
+                });
+
+                this.popover = true;
+            }
+
+            this.$el.popover('show');
+        },
         mouseEnter: function() {
             if (this.popoverAllowed()) {
-                this.$el.popover('show');
+                this.showPopover();
             }
 
             this.getWidget().trigger('day.mouseenter', this);
@@ -225,6 +254,7 @@ $(function() {
         initialize: function(models, options) {
             this.widget = options.widget;
             this.container = this.widget.pricesContainer;
+            this.currentlyLoading = false;
 
             var length = models.length,
                 DAYS_PER_PAGE = this.widget.getDaysPerPage();
@@ -234,13 +264,19 @@ $(function() {
             }
 
             if (length == 0) {
-                throw new Error("Widget must be initialized with at least " + DAYS_PER_PAGE + " days ");
+                throw new Error("Widget must be initialized with at least " + DAYS_PER_PAGE + " days");
             }
 
             this.pages = new PagesInfo(length / DAYS_PER_PAGE);
         },
-        checkLength: function(models) {
-            return (models.length % this.widget.getDaysPerPage() == 0);
+        /**
+         * Validate length of adding days
+         *
+         * @param {Array} days
+         * @returns {boolean}
+         */
+        checkLength: function(days) {
+            return (days.length % this.widget.getDaysPerPage() == 0);
         },
         /**
          * Insert loaded days into collection
@@ -262,27 +298,16 @@ $(function() {
 
             return true;
         },
-        lastDayOfPage: function(page) {
-            return ((page + 1) * this.widget.getDaysPerPage()) - 1;
-        },
         /**
-         * Get day which $el is placed at position
+         * Get last day of given page
          *
-         * @param {Number} index $el position
+         * @param {Number} page
          * @returns {Day}
          */
-        atContainer: function(index) {
-            var collectionIndex = 0;
-
-            this.container.find('li.panel-day').each(function(i, panel) {
-                if (i == index) {
-                    return false;
-                } else {
-                    if (!$(panel).hasClass('day-loading')) {
-                        collectionIndex++;
-                    }
-                }
-            });
+        lastOfPage: function(page) {
+            var index = ((page + 1) * this.widget.getDaysPerPage()) - 1,
+                $el = this.container.find('li.panel-day').eq(index),
+                collectionIndex = index - $el.prevAll("." + DAY_LOADING_CLASS).length;
 
             return this.at(collectionIndex);
         },
@@ -291,11 +316,15 @@ $(function() {
          *
          * @param {Array} pages Indexes of pages
          * @param {Object} after [Moment] Load days directly after this date
-         * @param {Number} addFrom Index of an element after which loaded days will be placed
+         * @param {Number} addFrom Index of a day after which loaded days will be added
          * @returns {*}
          */
         fetchPages: function(pages, after, addFrom) {
             var self = this;
+
+            if (this.currentlyLoading) {
+                return;
+            }
 
             after.add(1, 'days');
 
@@ -308,6 +337,8 @@ $(function() {
                 beforeSend: function() {
                     self.pages.set(pages, DayCollection.PAGE_LOADING);
                     self.widget.toggleControls(true);
+
+                    self.currentlyLoading = true;
                 }
             }).done(function(data) {
                 if (self.addPage(data, addFrom)) {
@@ -317,15 +348,20 @@ $(function() {
                 //
             }).always(function() {
                 self.widget.toggleControls(false);
+
+                self.currentlyLoading = false;
             });
         },
         /**
          * Check if loading is needed, compose loading and run fetchPages()
          *
          * @param {Number} page Number of page
-         * @returns {*}
          */
-        loadPage: function(page) {
+        loadRequiredPages: function(page) {
+            if (this.currentlyLoading) {
+                return;
+            }
+
             // Detecting pages need to load
             var DAYS_PER_PAGE = this.widget.getDaysPerPage(),
                 requiredPages = this.pages.getRequired(page),
@@ -354,30 +390,38 @@ $(function() {
             }
 
             var distance = (_.first(requiredPages) - 1) - lastLoadedPageIndex,
-                lastDayOfPageIndex = this.lastDayOfPage(lastLoadedPageIndex),
-                lastDayOfPage = this.atContainer(lastDayOfPageIndex),
+                lastDayOfPage = this.lastOfPage(lastLoadedPageIndex),
                 after = lastDayOfPage.get("date").clone();
 
             if (distance > 0) {
                 // insert with gap after lastDayOfPage
                 after.add(distance * DAYS_PER_PAGE, 'days');
-
-                lastDayOfPageIndex += distance * DAYS_PER_PAGE;
             }
 
             if (chunksLOADIND) {
-                lastDayOfPage.view.$el.after(loadingTemplate({length: chunksLOADIND * DAYS_PER_PAGE}));
+                var daysLOADING = chunksLOADIND * DAYS_PER_PAGE,
+                    containerWidth = parseInt(this.container.css('width'), 10),
+                    newContainerWidth = containerWidth + (daysLOADING * WidgetView.DAY_WIDTH);
+
+                this.container.css('width', newContainerWidth + "px");
+
+                lastDayOfPage.view.$el.after(renderLOADING({
+                    days: daysLOADING
+                }));
             }
 
-            this.fetchPages(requiredPages, after, lastDayOfPageIndex + 1);
+            this.fetchPages(requiredPages, after, this.indexOf(lastDayOfPage) + 1);
         }
     }, {
-        PAGE_LOADED: "loaded",
-        PAGE_LOADING: "loading",
-        PAGE_PENDING: "pending"
+        PAGE_LOADED:  "loaded",  // All days of page has been successfully loaded and present in container
+        PAGE_LOADING: "loading", // Same as PAGE_LOADING, but days of page are currently loading
+        PAGE_PENDING: "pending"  // .day-loading elements in container instead of real days in the page.
     });
 
     var Widget = Backbone.Model.extend({
+        initialize: function() {
+            this.on('page.change', this.pageChanged);
+        },
         defaults: function() {
             return {
                 minNights: 1,
@@ -385,6 +429,9 @@ $(function() {
                 days: [],
                 DAYS_PER_PAGE: 7
             };
+        },
+        pageChanged: function(page) {
+            this.days.loadRequiredPages(page);
         }
     });
 
@@ -425,6 +472,32 @@ $(function() {
             this.$('a.widget-action').toggleClass("disabled", disable);
         },
         /**
+         * Set current page
+         *
+         * @param {Number} page
+         */
+        setPage: function(page) {
+            var previousPage = this.page;
+
+            this.page = page;
+
+            if (this.page < 0) { // prevent left border cross
+                this.page = 0;
+            }
+
+            if (previousPage != this.page) {
+                this.model.trigger('page.change', page);
+            }
+        },
+        /**
+         * Change current page by steps
+         *
+         * @param {Number} steps
+         */
+        updatePage: function(steps) {
+            this.setPage(this.page + steps);
+        },
+        /**
          * Move prices container <steps> from current position
          *
          * @param {Event} e
@@ -433,19 +506,20 @@ $(function() {
         scroll: function(e, steps) {
             e.preventDefault();
 
-            this.page += steps;
+            var previousPage = this.page;
 
-            if (this.page < 0) { // prevent left border cross
-                this.page = 0;
+            this.updatePage(steps);
+
+            var containerOffset = WidgetView.DAY_WIDTH * this.getDaysPerPage() * this.page,
+                duration = WidgetView.BASE_SCROLL_DURATION * ((Math.abs(previousPage - this.page) / 2) + 0.5);
+
+            if (!PriceWidget.isWide()) {
+                duration = duration * 1.4;
             }
-
-            var containerOffset = WidgetView.DAY_WIDTH * this.getDaysPerPage() * this.page;
-
-            this.model.days.loadPage(this.page);
 
             this.pricesContainer.animate({
                 right: containerOffset + "px"
-            }, 'fast');
+            }, duration);
         },
         backward: function(e) {
             this.scroll(e, -1);
@@ -460,7 +534,8 @@ $(function() {
             this.scroll(e, 4);
         }
     }, {
-        DAY_WIDTH: 57
+        DAY_WIDTH: 57,
+        BASE_SCROLL_DURATION: 400
     });
 
     var WidgetView = AbstractWidgetView.extend({
@@ -481,6 +556,28 @@ $(function() {
         DayCollection: DayCollection,
         Widget: Widget,
         AbstractWidgetView: AbstractWidgetView,
+        isWide: function() {
+            if (!_.has(window, "matchMedia")) {
+                return false;
+            }
+
+            var result = window.matchMedia("screen and (min-width: 768px)");
+
+            return result.matches;
+        },
+        insertPlugin: function(container, view) {
+            var $el = $(view.render().el);
+
+            if (PriceWidget.isWide()) {
+                $el.css('opacity', 0);
+                container.html($el);
+                $el.animate({opacity: 1}, 2000);
+            } else {
+                container.html($el);
+            }
+
+            return container.data("priceWidget", view);
+        },
         plugin: {
             initialize: function(options) {
                 var view = new WidgetView({
@@ -488,9 +585,7 @@ $(function() {
                     container: this
                 });
 
-                this.html(view.render().el).data("priceWidget", view);
-
-                return this;
+                return PriceWidget.insertPlugin(this, view);
             },
             widget: function() {
                 return this.data("priceWidget");
@@ -525,4 +620,20 @@ $(function() {
             $.error("Invalid options for $.fn.priceWidget");
         }
     };
+
+    $('div.price-widget-container[data-initialize="true"]').each(function() {
+        var $this = $(this),
+            data = $this.data();
+
+        $this.removeAttr("data-days")
+            .removeAttr("data-url")
+            .removeAttr("data-min-nights")
+            .removeClass("price-widget-loading");
+
+        $this.priceWidget({
+            minNights: data.minNights || 1,
+            url: data.url,
+            days: data.days
+        });
+    });
 });

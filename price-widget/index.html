@@ -5,34 +5,44 @@
     <title>Price widget</title>
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="price-widget.css" rel="stylesheet">
+
+    <style>
+        .price-widget-container {
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 
 <body>
     <div class="container">
         <h1>Price widget</h1>
 
-        <div id="widget1"></div>
+        <div class="price-widget-container">
+            <div id="widget1"></div>
+        </div>
 
-        <div id="widget2"></div>
+        <div class="price-widget-container price-widget-booking">
+            <div id="widget2"></div>
+        </div>
     </div>
 
     <script id="widget-template" type="text/html">
         <div class="btn-group-vertical btn-group-left hidden-xs" role="group">
-            <a href="#" class="btn btn-primary widget-action widget-action-backward" title="Go back 1 week">
+            <a href="#" class="btn widget-action widget-action-backward" title="Go back 1 week">
                 <span class="glyphicon glyphicon-step-backward"></span>
             </a>
 
-            <a href="#" class="btn btn-primary widget-action widget-action-fast-backward" title="Go back 1 month">
+            <a href="#" class="btn widget-action widget-action-fast-backward" title="Go back 1 month">
                 <span class="glyphicon glyphicon-fast-backward"></span>
             </a>
         </div>
 
         <div class="btn-group-vertical btn-group-right hidden-xs" role="group">
-            <a href="#" class="btn btn-primary widget-action widget-action-forward" title="Go forward 1 week">
+            <a href="#" class="btn widget-action widget-action-forward" title="Go forward 1 week">
                 <span class="glyphicon glyphicon-step-forward"></span>
             </a>
 
-            <a href="#" class="btn btn-primary widget-action widget-action-fast-forward" title="Go forward 1 month">
+            <a href="#" class="btn widget-action widget-action-fast-forward" title="Go forward 1 month">
                 <span class="glyphicon glyphicon-fast-forward"></span>
             </a>
         </div>
@@ -44,19 +54,19 @@
 
             <div class="panel-footer visible-xs">
                 <div class="btn-group btn-group-justified">
-                    <a href="#" class="btn btn-primary widget-action widget-action-fast-backward" title="Go back 1 month">
+                    <a href="#" class="btn widget-action widget-action-fast-backward" title="Go back 1 month">
                         <span class="glyphicon glyphicon-fast-backward"></span>
                     </a>
 
-                    <a href="#" class="btn btn-primary widget-action widget-action-backward" title="Go back 1 week">
+                    <a href="#" class="btn widget-action widget-action-backward" title="Go back 1 week">
                         <span class="glyphicon glyphicon-step-backward"></span>
                     </a>
 
-                    <a href="#" class="btn btn-primary widget-action widget-action-forward" title="Go forward 1 week">
+                    <a href="#" class="btn widget-action widget-action-forward" title="Go forward 1 week">
                         <span class="glyphicon glyphicon-step-forward"></span>
                     </a>
 
-                    <a href="#" class="btn btn-primary widget-action widget-action-fast-forward" title="Go forward 1 month">
+                    <a href="#" class="btn widget-action widget-action-fast-forward" title="Go forward 1 month">
                         <span class="glyphicon glyphicon-fast-forward"></span>
                     </a>
                 </div>
@@ -72,8 +82,14 @@
         <div class="panel-body day-<%= type %><% if (isActive) { %> day-active<% } %>">
             <% if (type == "sold") { %>
                 SOLD
+            <% } else if (type == "poa") { %>
+                Enquire
             <% } else { %>
-                <%= currency %><%= price %>
+                <% if (price) { %>
+                    <%= currency %><%= price %>
+                <% } else { %>
+                    &nbsp;
+                <% } %>
             <% } %>
         </div>
 
@@ -95,7 +111,7 @@
     </script>
 
     <script id="day-loading-template" type="text/html">
-        <% _.times(length, function() { %>
+        <% _.times(days, function() { %>
             <li class="panel panel-day day-loading"></li>
         <% }); %>
     </script>
@@ -110,8 +126,14 @@
 
     <script id="day-popover-content-template" type="text/html">
         <%= date_POPOVER %>
+
         <br>
-        <%= currency %><%= price %> per night, min <%= minNights %> night<% if (minNights != 1) { %>s<% } %>
+
+        <% _.each(prices, function(dayPrice) { %>
+            <%= currency %><%= dayPrice.price %> per night,
+            min <%= dayPrice.nights %> night<% if (dayPrice.nights != 1) { %>s<% } %>
+            <br>
+        <% }); %>
     </script>
 
     <script src="../js/jquery-2.1.4.min.js" type="text/javascript"></script>
