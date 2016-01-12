@@ -1,4 +1,4 @@
-$_ajax = function(options) {
+$.ajax = function(options) {
     var FORMAT_SERVER = "MM/DD/YYYY";
     var REQUEST_DELAY = {
         min: 500,

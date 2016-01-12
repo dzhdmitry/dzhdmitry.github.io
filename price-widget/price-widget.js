@@ -6,9 +6,9 @@ $(function() {
     }
 
     var DAY_LOADING_CLASS = "day-loading",
-        renderLOADING = _.template($('#day-loading-template').html()),
+        renderLOADING = _.getTemplate('day-loading-template'),
         dayPopoverTemplate = $('#day-popover-template').html(),
-        renderPopoverContent = _.template($('#day-popover-content-template').html());
+        renderPopoverContent = _.getTemplate('day-popover-content-template');
 
     var PagesInfo = function(pages) {
         this.pages = {};
@@ -117,9 +117,6 @@ $(function() {
                 discount: 0,
                 type: "",
                 prices: [],
-                checkbox: false,
-                isChecked: false,
-                isActive: false,
 
                 // {Moment} Composed in initialize
                 date: null,
@@ -157,6 +154,9 @@ $(function() {
                 container.append(el);
             }
         },
+        isType: function(type) {
+            return this.get("type") == type;
+        },
         /**
          * Get date representation according to given format
          *
@@ -178,7 +178,7 @@ $(function() {
 
     var DayView = Backbone.View.extend({
         tagName: 'li',
-        template: _.template($('#day-template').html()),
+        template: _.getTemplate('day-template'),
         events: {
             'mouseenter': "mouseEnter",
             'mouseleave': "mouseLeave"
@@ -201,14 +201,11 @@ $(function() {
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
             this.$el.addClass("panel panel-day");
-            this.$el.attr("data-d", this.model.get("date_POPOVER"));
 
             return this;
         },
         popoverAllowed: function() {
-            var type = this.model.get("type");
-
-            return !(type == "poa" || type == "sold");
+            return !(this.model.isType("poa") || this.model.isType("sold"));
         },
         /**
          * Initialize (if needed) and show day's popover
@@ -328,7 +325,7 @@ $(function() {
 
             after.add(1, 'days');
 
-            return $_ajax({
+            return $.ajax({
                 url: this.url(),
                 data: {
                     start: after.format(Day.formats.SERVER),
@@ -437,7 +434,7 @@ $(function() {
 
     var AbstractWidgetView = Backbone.View.extend({
         tagName: 'div',
-        template: _.template($('#widget-template').html()),
+        template: _.getTemplate('widget-template'),
         events: {
             'click a.widget-action-backward': "backward",
             'click a.widget-action-fast-backward': "fastBackward",
@@ -621,7 +618,7 @@ $(function() {
         }
     };
 
-    $('div.price-widget-container[data-initialize="true"]').each(function() {
+    $('div.price-widget-container[data-initialize="widget"]').each(function() {
         var $this = $(this),
             data = $this.data();
 

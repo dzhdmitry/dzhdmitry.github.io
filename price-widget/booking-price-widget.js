@@ -5,20 +5,72 @@ $(function() {
 
     var Day = PriceWidget.Day.extend({
         defaults: function() {
-            return _.extend({}, Day.__super__.defaults.call(this), {
-                checkbox: true
+            var defaults = Day.__super__.defaults.call(this);
+
+            return _.extend({}, defaults, {
+                checkbox: true,
+                isChecked: false,
+                isActive: false
             });
+        },
+        isChecked: function() {
+            return this.get("isChecked");
+        },
+        toJSON: function() {
+            return _.extend(Day.__super__.toJSON.call(this), {
+                finalPrice: this.getFinalPrice()
+            });
+        },
+        /**
+         * Get price according to checked days
+         *
+         * @returns {Number}
+         */
+        getFinalPrice: function() {
+            var finalPrice = this.get("price"),
+                checked = this.collection.checked();
+
+            if (checked.length && this.isChecked()) {
+                _.each(this.get("prices"), function(price) {
+                    if (checked.length >= price.nights) {
+                        finalPrice = price.price;
+                    }
+                });
+            }
+
+            return finalPrice;
+        },
+        /**
+         * Get max nights for all prices of a day
+         *
+         * @returns {Number}
+         */
+        getMaxNights: function() {
+            if (this.isType("available")) {
+                var maxNights = 1;
+
+                _.each(this.get("prices"), function(price) {
+                    if (price.nights > maxNights) {
+                        maxNights = price.nights;
+                    }
+                });
+
+                return maxNights;
+            } else {
+                return 0;
+            }
         }
     });
 
     var DayView = PriceWidget.DayView.extend({
+        template: _.getTemplate('day-booking-template'),
         events: {
             'mouseenter': "mouseEnter",
             'mouseleave': "mouseLeave",
             'change input[type="checkbox"]': "checked"
         },
         checked: function(e) {
-            var currentPosition,
+            var currentPosition = 0,
                 from,
                 to,
                 currentModel = this.model,
@@ -28,17 +80,29 @@ $(function() {
                 checkedBefore = [],
                 checkedAfter = [];
 
+            function isCurrentModel(model) {
+                return model.id == currentModel.id;
+            }
+
+            function setIfOther(model, modelChecked) {
+                if (!isCurrentModel(model)) {
+                    model.set("isChecked", modelChecked);
+                }
+            }
+
             currentModel.set("isChecked", isChecked);
 
+            // Checking state of all days
             collection.each(function(model, i) {
-                if (model.id == currentModel.id) {
+                if (isCurrentModel(model)) {
                     currentPassed = true;
                     currentPosition = i;
                 } else {
                     if (currentPassed) { // after current
-                        if (model.get("isChecked")) {
+                        if (model.isChecked()) {
                             if (isChecked) {
                                 if (_.isUndefined(to)) {
+                                    // `to` is first day of selection after current day, `from` is current
                                     to = i;
                                 }
                             } else {
@@ -46,8 +110,9 @@ $(function() {
                             }
                         }
                     } else { // before current
-                        if (model.get("isChecked")) {
+                        if (model.isChecked()) {
                             if (isChecked) {
+                                // `from` is day after last checked day before current, `to` is current
                                 from = i + 1;
                             } else {
                                 checkedBefore.push(i);
@@ -59,27 +124,54 @@ $(function() {
 
             if (isChecked) {
                 // Merge checked with current
-                var soldFound = false;
+                var prevIndex,
+                    gapFound = false;
 
-                if (_.isUndefined(from)) {
-                    from = currentPosition + 1;
+                if (_.isUndefined(from)) { // No one checked before
+                    from = currentPosition;
                 }
 
                 if (_.isUndefined(to)) {
                     to = currentPosition;
                 }
 
-                _.each(collection.slice(from, to), function(model) {
-                    if (model.get("type") == "sold" || model.get("type") == "poa") {
-                        soldFound = true;
-                    } else {
-                        model.set("isChecked", isChecked);
-                    }
-                });
+                if (to != currentPosition || from != currentPosition) {
+                    // Search for empty days/`.day-loading` between selection and current day
+                    var days,
+                        previousDate;
 
-                if (soldFound) { // actually any unavailable checkbox
+                    if (to <= currentPosition) { // There is a selection before
+                        days = collection.slice(from - 1, currentPosition + 1);
+                    } else if (from >= currentPosition) { // There is a selection after
+                        days = collection.slice(currentPosition, to + 1);
+                    }
+
+                    _.each(days, function(model) {
+                        if (previousDate && model.get("date").diff(previousDate, 'days') > 1) {
+                            // Empty days/`.day-loading` found
+                            gapFound = true;
+                        }
+
+                        previousDate = model.get("date");
+                    });
+                }
+
+                if (!gapFound) {
+                    // Search for sold or poa days (cannot be selected)
+                    _.each(collection.slice(from, to), function(model) {
+                        if (model.isType("sold") || model.isType("poa")) {
+                            gapFound = true;
+                        } else {
+                            setIfOther(model, true);
+                        }
+
+                        prevIndex = collection.indexOf(model);
+                    });
+                }
+
+                if (gapFound) { // actually any unavailable checkbox
                     collection.each(function(model) {
-                        model.set("isChecked", (model.id == currentModel.id));
+                        setIfOther(model, isCurrentModel(model));
                     });
                 }
             } else {
@@ -94,10 +186,17 @@ $(function() {
 
                 if (!_.isUndefined(from) && !_.isUndefined(to)) {
                     _.each(collection.slice(from, to), function(model) {
-                        model.set("isChecked", isChecked);
+                        setIfOther(model, false);
                     });
                 }
             }
+
+            collection.each(function(model) {
+                // Update final price on active checked days
+                if (!isCurrentModel(model) && model.isChecked() && model.get("isActive")) {
+                    model.view.render();
+                }
+            });
 
             collection.selectionChanged();
             collection.widget.model.lazyChange();
@@ -107,13 +206,57 @@ $(function() {
     var DayCollection = PriceWidget.DayCollection.extend({
         view: DayView,
         model: Day,
+        /**
+         * Get days to maximum discount available for current active days
+         *
+         * @returns {Number}
+         */
+        daysToMaxDiscount: function() {
+            var active = this.active(),
+                daysToMaxDiscount = 0;
+
+            _.each(active, function(day) {
+                var diff = day.getMaxNights() - active.length;
+
+                if (diff > daysToMaxDiscount) {
+                    daysToMaxDiscount = diff;
+                }
+            });
+
+            return daysToMaxDiscount;
+        },
+        /**
+         * Booking is allowed if user checked more then or equal to minNights for a property
+         *
+         * @returns {Boolean}
+         */
+        bookingAllowed: function() {
+            var checked = this.where({isChecked: true});
+
+            return checked.length >= this.widget.model.get("minNights");
+        },
         selectionChanged: function() {
-            var checked = this.where({isChecked: true}),
-                isActive = checked.length >= this.widget.model.get("minNights");
+            var bookingAllowed = this.bookingAllowed();
 
             this.each(function(day) {
-                day.set('isActive', isActive ? day.get('isChecked') : false);
+                day.set('isActive', bookingAllowed ? day.isChecked() : false);
             });
+        },
+        /**
+         * Get all currently active days
+         *
+         * @returns {Day[]} days with `isActive`=true
+         */
+        active: function() {
+            return this.where({isActive: true});
+        },
+        /**
+         * Get all currently checked days
+         *
+         * @returns {Day[]} days with `isChecked`=true
+         */
+        checked: function() {
+            return this.where({isChecked: true});
         }
     });
 

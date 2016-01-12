@@ -1,0 +1,27 @@
+@screen-xs-max: (@screen-sm-min - 1);
+@screen-sm-min: 768px;
+@screen-md-min: 992px;
+@screen-lg-min: 1200px;
+
+@color-primary: #4095b5;
+@color-success: #5cb140;
+@color-warning: #f2a926;
+@color-danger: #d35451;
+@color-panel-border: #ddd;
+
+@search-width: 900px;
+@navbar-top-height: 50px;
+@panel-radius: 5px;
+
+.background-gradient(@top, @bottom: darken(@top, 12%)) {
+    @msTop: argb(@top);
+    @msBottom: argb(@bottom);
+
+    background-image: -webkit-linear-gradient(top, @top 0%, @bottom 100%);
+    background-image:      -o-linear-gradient(top, @top 0%, @bottom 100%);
+    background-image: -webkit-gradient(linear, left top, left bottom, from(@top), to(@bottom));
+    background-image:         linear-gradient(to bottom, @top 0%, @bottom 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='@{msTop}', endColorstr='@{msBottom}', GradientType=0);
+    filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+    background-repeat: repeat-x;
+}

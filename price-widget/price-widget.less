@@ -1,7 +1,4 @@
-@color-primary: #4095b5;
-@color-success: #5cb140;
-@color-warning: #f0ad4e;
-@color-danger: #d35451;
+@import (reference) "global";
 
 @day-width: 55px;
 @day-outer-width: 57px;
@@ -10,19 +7,6 @@
 
 @day-background: #d6d6d7;
 @day-background-hover: lighten(@day-background, 5%);
-
-.background-gradient(@top, @bottom: darken(@top, 12%)) {
-    @msTop: argb(@top);
-    @msBottom: argb(@bottom);
-
-    background-image: -webkit-linear-gradient(top, @top 0%, @bottom 100%);
-    background-image:      -o-linear-gradient(top, @top 0%, @bottom 100%);
-    background-image: -webkit-gradient(linear, left top, left bottom, from(@top), to(@bottom));
-    background-image:         linear-gradient(to bottom, @top 0%, @bottom 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='@{msTop}', endColorstr='@{msBottom}', GradientType=0);
-    filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
-    background-repeat: repeat-x;
-}
 
 .btn-group-vertical {
     margin-top: 12px;
@@ -61,8 +45,6 @@
     }
 }
 
-@screen-sm-min: 768px;
-
 .price-widget-container {
     height: 122px;
 
@@ -95,12 +77,13 @@
     }
 
     .btn.widget-action {
-        .background-gradient(@color-primary);
+        background-color: @color-primary;
         color: white;
-        border: 1px solid @color-primary;
+        border: 0;
+        margin-bottom: 2px;
 
         &:hover {
-            .background-gradient(darken(@color-primary, 12%));
+            background-color: darken(@color-primary, 12%);
         }
     }
 
@@ -115,7 +98,7 @@
 
 .price-widget {
     @widget-border-radius: 8px;
-    @widget-control-width: 30px;
+    @widget-control-width: 28px;
 
     border-radius: @widget-border-radius;
     margin-bottom: 0;
@@ -136,9 +119,11 @@
             > .btn.widget-action {
                 padding: 4px 12px;
                 font-size: 12px;
+                border-left: 1px solid darken(@color-primary, 12%);
 
                 &:first-child {
                     border-top-left-radius: 0;
+                    border-left: 0;
                 }
 
                 &:last-child {
@@ -210,19 +195,19 @@
         color: white;
 
         &.day-available {
-            .background-gradient(@color-primary);
+            .background-gradient(@color-primary, darken(@color-primary, 8%));
         }
 
         &.day-active {
-            .background-gradient(@color-success);
+            .background-gradient(@color-success, darken(@color-success, 8%));
         }
 
         &.day-poa {
-            .background-gradient(@color-warning);
+            .background-gradient(@color-warning, darken(@color-warning, 8%));
         }
 
         &.day-sold {
-            .background-gradient(@color-danger);
+            .background-gradient(@color-danger, darken(@color-danger, 8%));
         }
     }
 
