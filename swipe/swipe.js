@@ -63,16 +63,22 @@ var report = (function() {
         this.el.on('touchstart', function(e) {
             var touch = self.getLastTouch(e);
 
+            e.preventDefault();
+
             previousClientX = touch.clientX;
         }).on('touchmove', function(e) {
             var touch = self.getLastTouch(e),
                 offset = touch.clientX - previousClientX;
+
+            e.preventDefault();
 
             self.changeLeft(offset);
             self.recorder.add(e.timeStamp);
 
             previousClientX = touch.clientX;
         }).on('touchend', function(e) {
+            e.preventDefault();
+
             self.recorder.add(e.timeStamp);
             report(self.recorder.items);
             self.recorder.clear();
