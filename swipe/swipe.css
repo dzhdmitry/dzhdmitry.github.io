@@ -1,0 +1,27 @@
+.swipe-container {
+  border: 1px solid #333;
+  padding: 5px;
+  width: 50%;
+  height: 100px;
+  margin: 0 auto 0 auto;
+  overflow-x: hidden;
+}
+.swipe {
+  background-color: #333;
+  color: #fff;
+  width: 800px;
+  height: 88px;
+  cursor: move;
+  position: relative;
+  left: 0;
+}
+#report-container {
+  height: 300px;
+  overflow-y: hidden;
+}
+.report-item {
+  width: 5px;
+  background-color: red;
+  float: left;
+  margin-right: 2px;
+}
