@@ -207,6 +207,7 @@
     <script src="../js/backbone-min.js" type="text/javascript"></script>
     <script src="../js/moment.js" type="text/javascript"></script>
     <script src="../common.js" type="text/javascript"></script>
+    <script src="../movable/movable.js" type="text/javascript"></script>
     <script src="ajax.js" type="text/javascript"></script>
     <script src="price-widget.js" type="text/javascript"></script>
     <script src="booking-price-widget.js" type="text/javascript"></script>
@@ -248,13 +249,13 @@
             priceWidget = $w1.priceWidget({
                 url: "/property/1/prices",
                 days: DATA
-            });
+            }).priceWidget("widget");
 
             bookingPriceWidget = $w2.bookingPriceWidget({
                 url: "/property/2/prices",
                 days: DATA,
                 minNights: 3
-            });
+            }).priceWidget("widget");
 
             $w2.on('prices.change', function(e, view) {
                 //console.log('prices.change', view);

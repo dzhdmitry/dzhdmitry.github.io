@@ -27,7 +27,9 @@
         }
 
         this.getLeft = function() {
-            return parseInt(this.el.css(this.property), 10);
+            var rawLeft = parseInt(this.el.css(this.property), 10);
+
+            return (rawLeft) ? rawLeft : 0;
         };
 
         this.setLeft = function(left) {
@@ -38,16 +40,19 @@
             var left = this.getLeft(),
                 newLeft = left + offset;
 
+            //console.log("bnl", newLeft);
             if (settings.borders) {
                 var parentWidth = this.el.parent().width();
 
                 if (newLeft > 0) {
                     newLeft = 0;
-                } else if (left + parentWidth >= 0) {
-                    var diff = newLeft + parentWidth;
+                } else {
+                    if (parentWidth - left >= this.el.width()) {
+                        var diff = newLeft + parentWidth;
 
-                    if (diff < 0) {
-                        newLeft -= diff;
+                        if (diff < 0) {
+                            newLeft -= diff;
+                        }
                     }
                 }
             }
@@ -59,10 +64,19 @@
             return event.originalEvent.touches[0];
         };
 
+        this.trigger = function(e, type, args) {
+            var event = jQuery.Event(type);
+
+            event.originalEvent = e;
+
+            self.el.trigger(event, args);
+        };
+
         this.el.on('touchstart', function(e) {
             var touch = self.getLastTouch(e);
 
             e.preventDefault();
+            self.trigger(e, "move.start");
 
             previousClientX = touch.clientX;
         }).on('touchmove', function(e) {
@@ -70,18 +84,30 @@
                 offset = touch.clientX - previousClientX;
 
             e.preventDefault();
+            self.trigger(e, "move.moving");
             self.move(offset);
 
             previousClientX = touch.clientX;
         }).on('touchend', function(e) {
             e.preventDefault();
+            self.trigger(e, "move.end");
         });
+
+        this.el.data("movable-plugin", this);
     };
 
     var Plugin = function(options) {
-        this.each(function(i, el) {
-            new Movable($(el), options);
-        });
+        if (typeof options == "string") {
+            var movable = this.data("movable-plugin");
+
+            if (_.has(movable, options)) {
+                return movable[options]();
+            }
+        } else {
+            this.each(function(i, el) {
+                new Movable($(el), options);
+            });
+        }
 
         return this;
     };

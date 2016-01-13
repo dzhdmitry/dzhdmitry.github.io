@@ -424,7 +424,8 @@ $(function() {
                 minNights: 1,
                 url: "",
                 days: [],
-                DAYS_PER_PAGE: 7
+                DAYS_PER_PAGE: 7,
+                movable: true // <false> if movable is not needed, <object> options for $.fn.movable, <true> for default
             };
         },
         pageChanged: function(page) {
@@ -444,6 +445,7 @@ $(function() {
         initialize: function(options) {
             var self = this;
 
+            this.day = 0;
             this.page = 0;
             this.container = options.container;
 
@@ -456,9 +458,25 @@ $(function() {
             });
         },
         render: function() {
+            var self = this,
+                movable = this.model.get("movable");
+
             this.$el.html(this.template(this.model.toJSON()));
 
             this.pricesContainer = this.$el.find('ul.prices-container');
+
+            if (movable) {
+                if (!$.fn.movable) {
+                    throw new Error("PriceWidget requires Movable plugin");
+                }
+
+                this.pricesContainer.movable(movable).on('move.moving', function(e) {
+                    var left = self.pricesContainer.movable("getLeft"),
+                        day = Math.floor(left / -AbstractWidgetView.DAY_WIDTH);
+
+                    self.setDay(day);
+                });
+            }
 
             return this;
         },
@@ -483,52 +501,67 @@ $(function() {
             }
 
             if (previousPage != this.page) {
-                this.model.trigger('page.change', page);
+                this.model.trigger('page.change', this.page);
             }
         },
         /**
-         * Change current page by steps
+         * Set current day. Updates current page if day changed
          *
-         * @param {Number} steps
+         * @param {Number} day
          */
-        updatePage: function(steps) {
-            this.setPage(this.page + steps);
+        setDay: function(day) {
+            var previousDay = this.day;
+
+            this.day = day;
+
+            if (this.day < 0) { // prevent left border cross
+                this.day = 0;
+            }
+
+            if (previousDay != this.day) {
+                var page = Math.floor(this.day / this.getDaysPerPage());
+
+                this.setPage(page);
+            }
+        },
+        updateDay: function(offset) {
+            this.setDay(this.day + offset);
         },
         /**
-         * Move prices container <steps> from current position
+         * Move prices container <days> from current position
          *
          * @param {Event} e
-         * @param {Number} steps Offset
+         * @param {Number} days Offset
          */
-        scroll: function(e, steps) {
+        scroll: function(e, days) {
+            var previousDay = this.day;
+
             e.preventDefault();
+            this.updateDay(days);
 
-            var previousPage = this.page;
-
-            this.updatePage(steps);
-
-            var containerOffset = WidgetView.DAY_WIDTH * this.getDaysPerPage() * this.page,
-                duration = WidgetView.BASE_SCROLL_DURATION * ((Math.abs(previousPage - this.page) / 2) + 0.5);
+            var containerOffset = AbstractWidgetView.DAY_WIDTH * this.day,
+                difference = Math.abs(previousDay - this.day),
+                duration = (difference * 15 + 80) * 2;
 
             if (!PriceWidget.isWide()) {
-                duration = duration * 1.4;
+                duration *= 1.4;
             }
 
             this.pricesContainer.animate({
-                right: containerOffset + "px"
+                left: "-" + containerOffset + "px"
             }, duration);
         },
         backward: function(e) {
-            this.scroll(e, -1);
+            this.scroll(e, -1 * this.getDaysPerPage());
         },
         fastBackward: function(e) {
-            this.scroll(e, -4);
+            this.scroll(e, -4 * this.getDaysPerPage());
         },
         forward: function(e) {
-            this.scroll(e, 1);
+            this.scroll(e, 1 * this.getDaysPerPage());
         },
         fastForward: function(e) {
-            this.scroll(e, 4);
+            this.scroll(e, 4 * this.getDaysPerPage());
         }
     }, {
         DAY_WIDTH: 57,
