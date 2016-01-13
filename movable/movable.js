@@ -3,25 +3,35 @@
      * Movable plugin. Makes element movable horizontally
      *
      * @param {jQuery} $el
-     * @param {{borders}} options
+     * @param {{borders, method}} options
      * @constructor
      */
     var Movable = function($el, options) {
         var self = this,
-            defaults = {
-                borders: true
-            },
-            settings = $.extend({}, defaults, options),
+            settings = $.extend({}, Plugin.defaults, options),
             previousClientX;
 
         this.el = $el;
 
+        switch (settings.method) {
+            case Plugin.METHOD_POSITION:
+                this.property = "left";
+
+                break;
+            case Plugin.METHOD_MARGIN:
+                this.property = "marginLeft";
+
+                break;
+            default:
+                throw new Error("`" + settings.method + "` is not valid method");
+        }
+
         this.getLeft = function() {
-            return parseInt(this.el.css("left"), 10);
+            return parseInt(this.el.css(this.property), 10);
         };
 
         this.setLeft = function(left) {
-            this.el.css("left", left + "px");
+            this.el.css(this.property, left + "px");
         };
 
         this.move = function(offset) {
@@ -46,7 +56,7 @@
         };
 
         this.getLastTouch = function(event) {
-            return _.last(event.originalEvent.touches);
+            return event.originalEvent.touches[0];
         };
 
         this.el.on('touchstart', function(e) {
@@ -68,13 +78,24 @@
         });
     };
 
-    $.fn.movable = function(options) {
+    var Plugin = function(options) {
         this.each(function(i, el) {
             new Movable($(el), options);
         });
 
         return this;
     };
+
+    $.extend(Plugin, {
+        METHOD_POSITION: "position",
+        METHOD_MARGIN: "margin",
+        defaults: {
+            borders: true,
+            method: "position"
+        }
+    });
+
+    $.fn.movable = Plugin;
 })(jQuery);
 
 $(function() {
