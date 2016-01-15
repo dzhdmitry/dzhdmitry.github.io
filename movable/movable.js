@@ -40,7 +40,6 @@
             var left = this.getLeft(),
                 newLeft = left + offset;
 
-            //console.log("bnl", newLeft);
             if (settings.borders) {
                 var parentWidth = this.el.parent().width();
 
@@ -64,33 +63,22 @@
             return event.originalEvent.touches[0];
         };
 
-        this.trigger = function(e, type, args) {
-            var event = jQuery.Event(type);
-
-            event.originalEvent = e;
-
-            self.el.trigger(event, args);
-        };
-
         this.el.on('touchstart', function(e) {
             var touch = self.getLastTouch(e);
-
-            e.preventDefault();
-            self.trigger(e, "move.start");
 
             previousClientX = touch.clientX;
         }).on('touchmove', function(e) {
             var touch = self.getLastTouch(e),
-                offset = touch.clientX - previousClientX;
+                offset = touch.clientX - previousClientX,
+                event = jQuery.Event("move.moving");
 
             e.preventDefault();
-            self.trigger(e, "move.moving");
             self.move(offset);
 
             previousClientX = touch.clientX;
-        }).on('touchend', function(e) {
-            e.preventDefault();
-            self.trigger(e, "move.end");
+            event.originalEvent = e;
+
+            self.el.trigger(event);
         });
 
         this.el.data("movable-plugin", this);

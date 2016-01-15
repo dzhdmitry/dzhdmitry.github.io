@@ -14,13 +14,3 @@
   position: relative;
   left: 0;
 }
-#report-container {
-  height: 300px;
-  overflow-y: hidden;
-}
-.report-item {
-  width: 5px;
-  background-color: red;
-  float: left;
-  margin-right: 2px;
-}
