@@ -10,6 +10,25 @@ $(function() {
         dayPopoverTemplate = $('#day-popover-template').html(),
         renderPopoverContent = _.getTemplate('day-popover-content-template');
 
+    /**
+     * Get difference between two dates
+     *
+     * @param {Object} first
+     * @param {Object} second
+     * @returns {Number}
+     */
+    function differenceDays(first, second) {
+        var diff = first.clone().diff(second);
+
+        return moment.duration(diff).get("d");
+    }
+
+    /**
+     * Pages info store pages numbers with states
+     *
+     * @param {Object} pages {0: "loaded", ...}
+     * @constructor
+     */
     var PagesInfo = function(pages) {
         this.pages = {};
 
@@ -43,6 +62,18 @@ $(function() {
 
         this.isPending = function(page) {
             return this.is(page, DayCollection.PAGE_PENDING);
+        };
+
+        this.getPendingAmount = function() {
+            var amount = 0;
+
+            _.each(this.pages, function(status) {
+                if (status == DayCollection.PAGE_PENDING) {
+                    amount++;
+                }
+            });
+
+            return amount;
         };
 
         /**
@@ -106,7 +137,7 @@ $(function() {
             return indexes;
         };
 
-        this.set(_.range(pages), DayCollection.PAGE_LOADED);
+        this.pages = pages || {};
     };
 
     var Day = Backbone.Model.extend({
@@ -137,21 +168,29 @@ $(function() {
             this.set("date", moment(this.id, Day.formats.SERVER));
 
             var view = new this.collection.view({model: this}),
-                container = this.collection.container,
                 el = view.render().el;
 
             if (_.has(options, "at")) {
                 // Recognizing li.day-loading element and replace by view
-                var prev = this.collection.at(options.at - 1),
-                    diff = this.get("date").diff(prev.get("date")),
-                    duration = moment.duration(diff).get("d"),
-                    $replacement = prev.view.$el.nextAll().eq(duration - 1);
+                var anchor,
+                    $loading;
+
+                if (options.at == 0) {
+                    anchor = this.collection.at(0);
+                    $loading = anchor.view.$el.prevAll();
+                } else {
+                    anchor = this.collection.at(options.at - 1);
+                    $loading = anchor.view.$el.nextAll();
+                }
+
+                var duration = differenceDays(this.get("date"), anchor.get("date")),
+                    $replacement = $loading.eq(Math.abs(duration) - 1);
 
                 if ($replacement.hasClass(DAY_LOADING_CLASS)) {
                     $replacement.replaceWith(el);
                 }
             } else {
-                container.append(el);
+                this.collection.container.append(el);
             }
         },
         isType: function(type) {
@@ -264,7 +303,50 @@ $(function() {
                 throw new Error("Widget must be initialized with at least " + DAYS_PER_PAGE + " days");
             }
 
-            this.pages = new PagesInfo(length / DAYS_PER_PAGE);
+            // Performing PagesInfo
+            var today = moment(),
+                firstDate = moment(_.first(models).id, Day.formats.SERVER),
+                diff = differenceDays(today, firstDate);
+
+            if (diff > 0) {
+                throw new Error("Date of first day is earlier than today");
+            }
+
+            var pagesPending = Math.ceil(-diff / DAYS_PER_PAGE),
+                config = {},
+                loaded = length / DAYS_PER_PAGE;
+
+            _.each(_.range(0, pagesPending), function(x) {
+                config[x] = DayCollection.PAGE_PENDING;
+            });
+
+            _.each(_.range(pagesPending, pagesPending + loaded), function(x) {
+                config[x] = DayCollection.PAGE_LOADED;
+            });
+
+            this.pages = new PagesInfo(config);
+
+            // Prepend LOADINGs if first date is not today
+            var pendingPagesAmount = this.pages.getPendingAmount(),
+                pendingDays = pendingPagesAmount * this.widget.getDaysPerPage();
+
+            if (pendingPagesAmount) {
+                this.container.prepend(renderLOADING({
+                    days: pendingDays
+                }));
+
+                this.widget.day = pendingDays;
+                this.widget.page = pendingPagesAmount;
+
+                this.widget.move(0, true);
+            }
+
+            // Set min day
+            if (pendingDays > 0) {
+                this.minDay = pendingDays + diff - 1;
+            } else {
+                this.minDay = 0;
+            }
         },
         /**
          * Validate length of adding days
@@ -362,7 +444,7 @@ $(function() {
             // Detecting pages need to load
             var DAYS_PER_PAGE = this.widget.getDaysPerPage(),
                 requiredPages = this.pages.getRequired(page),
-                lastLoadedPageIndex = 0,
+                lastLoadedPageIndex,
                 chunksLOADIND = 0;
 
             // Prevent loading if not needed
@@ -386,28 +468,45 @@ $(function() {
                 }
             }
 
-            var distance = (_.first(requiredPages) - 1) - lastLoadedPageIndex,
-                lastDayOfPage = this.lastOfPage(lastLoadedPageIndex),
+            var distance,
+                after,
+                addFrom;
+
+            if (lastLoadedPageIndex == undefined) {
+                // Loading `pending` days before current
+                distance = _.size(requiredPages);
+                after = this.first().get("date").clone();
+                addFrom = 0;
+
+                after.subtract((DAYS_PER_PAGE * distance) + 1, 'days');
+
+                // Loading must be added when initialized
+            } else {
+                var lastDayOfPage = this.lastOfPage(lastLoadedPageIndex);
+
+                distance = (_.first(requiredPages) - 1) - lastLoadedPageIndex;
                 after = lastDayOfPage.get("date").clone();
+                addFrom = this.indexOf(lastDayOfPage) + 1;
 
-            if (distance > 0) {
-                // insert with gap after lastDayOfPage
-                after.add(distance * DAYS_PER_PAGE, 'days');
+                if (distance > 0) {
+                    // insert with gap after lastDayOfPage
+                    after.add(distance * DAYS_PER_PAGE, 'days');
+                }
+
+                if (chunksLOADIND) {
+                    var daysLOADING = chunksLOADIND * DAYS_PER_PAGE,
+                        containerWidth = parseInt(this.container.css('width'), 10),
+                        newContainerWidth = containerWidth + (daysLOADING * WidgetView.DAY_WIDTH);
+
+                    this.container.css('width', newContainerWidth + "px");
+
+                    lastDayOfPage.view.$el.after(renderLOADING({
+                        days: daysLOADING
+                    }));
+                }
             }
 
-            if (chunksLOADIND) {
-                var daysLOADING = chunksLOADIND * DAYS_PER_PAGE,
-                    containerWidth = parseInt(this.container.css('width'), 10),
-                    newContainerWidth = containerWidth + (daysLOADING * WidgetView.DAY_WIDTH);
-
-                this.container.css('width', newContainerWidth + "px");
-
-                lastDayOfPage.view.$el.after(renderLOADING({
-                    days: daysLOADING
-                }));
-            }
-
-            this.fetchPages(requiredPages, after, this.indexOf(lastDayOfPage) + 1);
+            this.fetchPages(requiredPages, after, addFrom);
         }
     }, {
         PAGE_LOADED:  "loaded",  // All days of page has been successfully loaded and present in container
@@ -514,8 +613,8 @@ $(function() {
 
             this.day = day;
 
-            if (this.day < 0) { // prevent left border cross
-                this.day = 0;
+            if (this.day < this.model.days.minDay) { // prevent left border cross
+                this.day = this.model.days.minDay;
             }
 
             if (previousDay != this.day) {
@@ -524,44 +623,56 @@ $(function() {
                 this.setPage(page);
             }
         },
-        updateDay: function(offset) {
-            this.setDay(this.day + offset);
-        },
         /**
-         * Move prices container <days> from current position
+         * Move container depending on previous day index
          *
-         * @param {Event} e
-         * @param {Number} days Offset
+         * @param {Number} previousDay
+         * @param {Boolean} immediate True if without animation
          */
-        scroll: function(e, days) {
-            var previousDay = this.day;
-
-            e.preventDefault();
-            this.updateDay(days);
-
+        move: function(previousDay, immediate) {
             var containerOffset = AbstractWidgetView.DAY_WIDTH * this.day,
-                difference = Math.abs(previousDay - this.day),
+                duration = 0;
+
+            if (!immediate) {
+                var difference = Math.abs(previousDay - this.day);
+
                 duration = (difference * 15 + 80) * 2;
 
-            if (!PriceWidget.isWide()) {
-                duration *= 1.4;
+                if (!PriceWidget.isWide()) {
+                    duration *= 1.4;
+                }
             }
 
             this.pricesContainer.animate({
                 left: "-" + containerOffset + "px"
             }, duration);
         },
+        /**
+         * Move prices container <days> from current position
+         *
+         * @param {Number} days Offset
+         */
+        scroll: function(days) {
+            var previousDay = this.day;
+
+            this.setDay(previousDay + days);
+            this.move(previousDay, false);
+        },
         backward: function(e) {
-            this.scroll(e, -1 * this.getDaysPerPage());
+            e.preventDefault();
+            this.scroll(-1 * this.getDaysPerPage());
         },
         fastBackward: function(e) {
-            this.scroll(e, -4 * this.getDaysPerPage());
+            e.preventDefault();
+            this.scroll(-4 * this.getDaysPerPage());
         },
         forward: function(e) {
-            this.scroll(e, 1 * this.getDaysPerPage());
+            e.preventDefault();
+            this.scroll(1 * this.getDaysPerPage());
         },
         fastForward: function(e) {
-            this.scroll(e, 4 * this.getDaysPerPage());
+            e.preventDefault();
+            this.scroll(4 * this.getDaysPerPage());
         }
     }, {
         DAY_WIDTH: 57,

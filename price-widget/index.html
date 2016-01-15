@@ -236,13 +236,15 @@
             var FORMAT_SERVER = "MM/DD/YYYY",
                 $w1 = $('#widget1'),
                 $w2 = $('#widget2'),
-                day = moment("11/30/2015", FORMAT_SERVER);
+                day = moment().add(30, "days");
 
             DATA = _.map(DATA, function(item) {
+                var id = day.format(FORMAT_SERVER);
+
                 day.add(1, 'days');
 
                 return _.extend({}, item, {
-                    id: day.format(FORMAT_SERVER)
+                    id: id
                 });
             });
 
