@@ -181,7 +181,7 @@ $(function() {
                 el = view.render().el;
 
             if (_.has(options, "at")) {
-                // Recognizing li.day-loading element and replace by view
+                // Recognizing .day-loading element and replace by view
                 var anchor,
                     $loading;
 
@@ -226,7 +226,7 @@ $(function() {
     });
 
     var DayView = Backbone.View.extend({
-        tagName: 'li',
+        tagName: 'div',
         template: _.getTemplate('day-template'),
         events: {
             'mouseenter': "mouseEnter",
@@ -410,7 +410,7 @@ $(function() {
          */
         lastOfPage: function(page) {
             var index = ((page + 1) * this.widget.getDaysPerPage()) - 1,
-                $el = this.container.find('li.panel-day').eq(index),
+                $el = this.container.find('.panel-day').eq(index),
                 collectionIndex = index - $el.prevAll("." + DAY_LOADING_CLASS).length;
 
             return this.at(collectionIndex);
@@ -587,7 +587,7 @@ $(function() {
 
             this.$el.html(this.template(this.model.toJSON()));
 
-            this.pricesContainer = this.$el.find('ul.prices-container');
+            this.pricesContainer = this.$el.find('.prices-container');
 
             if (movable) {
                 if (!$.fn.movable) {
