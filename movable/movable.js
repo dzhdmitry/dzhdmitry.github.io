@@ -41,12 +41,10 @@
                 newLeft = left + offset;
 
             if (settings.borders) {
-                var maxLeft = 0;
-
-                if (newLeft > maxLeft) {
-                    newLeft = maxLeft;
+                if (newLeft > settings.left) {
+                    newLeft = settings.left;
                 } else {
-                    var minLeft = this.el.parent().width() - this.el.width();
+                    var minLeft = this.el.parent().width() - this.el.width() - settings.right;
 
                     if (newLeft < minLeft) {
                         newLeft = minLeft;
@@ -59,6 +57,14 @@
 
         this.getLastTouch = function(event) {
             return event.originalEvent.touches[0];
+        };
+
+        this.set = function(option, value) {
+            if (_.isObject(value)) {
+                settings = _.extend({}, settings, value);
+            } else {
+                settings[option] = value;
+            }
         };
 
         this.el.on('touchstart', function(e) {
@@ -82,16 +88,18 @@
         this.el.data("movable-plugin", this);
     };
 
-    var Plugin = function(options) {
-        if (typeof options == "string") {
+    var Plugin = function(method) {
+        var parameters = _.toArray(arguments);
+
+        if (typeof method == "string") {
             var movable = this.data("movable-plugin");
 
-            if (_.has(movable, options)) {
-                return movable[options]();
+            if (_.has(movable, method)) {
+                return movable[method].apply(movable, parameters.slice(1));
             }
         } else {
             this.each(function(i, el) {
-                new Movable($(el), options);
+                new Movable($(el), method);
             });
         }
 
@@ -103,7 +111,9 @@
         METHOD_MARGIN: "margin",
         defaults: {
             borders: true,
-            method: "position"
+            method: "position",
+            left: 0,
+            right: 0
         }
     });
 
@@ -111,5 +121,8 @@
 })(jQuery);
 
 $(function() {
-    $('.movable').movable();
+    $('.movable').movable().eq(0).movable("set", {
+        left: -20,
+        right: -20
+    });
 });

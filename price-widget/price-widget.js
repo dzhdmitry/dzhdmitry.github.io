@@ -356,6 +356,8 @@ $(function() {
             // Set min day
             if (pendingDays > 0) {
                 this.minDay = pendingDays + diff - 1;
+
+                this.container.movable("set", "left", -this.minDay * WidgetView.DAY_WIDTH);
             } else {
                 this.minDay = 0;
             }
