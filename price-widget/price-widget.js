@@ -276,7 +276,7 @@ $(function() {
                 this.popover = true;
             }
 
-            this.$el.popover('show');
+            this.$el.popover('show').siblings().popover('hide');
         },
         mouseEnter: function() {
             if (this.popoverAllowed()) {
