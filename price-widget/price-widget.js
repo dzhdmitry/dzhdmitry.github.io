@@ -64,11 +64,21 @@ $(function() {
             return this.is(page, DayCollection.PAGE_PENDING);
         };
 
+        /**
+         * Get amount of pending pages before first loaded
+         *
+         * @returns {number}
+         */
         this.getPendingAmount = function() {
-            var amount = 0;
+            var amount = 0,
+                loadedFound = false;
 
             _.each(this.pages, function(status) {
-                if (status == DayCollection.PAGE_PENDING) {
+                if (status == DayCollection.PAGE_LOADED) {
+                    loadedFound = true;
+                }
+
+                if (!loadedFound && status == DayCollection.PAGE_PENDING) {
                     amount++;
                 }
             });
@@ -330,6 +340,8 @@ $(function() {
             var pendingPagesAmount = this.pages.getPendingAmount(),
                 pendingDays = pendingPagesAmount * this.widget.getDaysPerPage();
 
+            this.increaseWidth(pendingDays + models.length + 15);
+
             if (pendingPagesAmount) {
                 this.container.prepend(renderLOADING({
                     days: pendingDays
@@ -347,6 +359,17 @@ $(function() {
             } else {
                 this.minDay = 0;
             }
+        },
+        /**
+         * Increase width of days container depending on days width
+         *
+         * @param {Number} days
+         */
+        increaseWidth: function(days) {
+            var containerWidth = parseInt(this.container.css('width'), 10),
+                newContainerWidth = containerWidth + (days * WidgetView.DAY_WIDTH);
+
+            this.container.css('width', newContainerWidth + "px");
         },
         /**
          * Validate length of adding days
@@ -474,7 +497,9 @@ $(function() {
 
             if (lastLoadedPageIndex == undefined) {
                 // Loading `pending` days before current
-                distance = _.size(requiredPages);
+                var loadingGap = this.pages.getPendingAmount() - _.last(requiredPages) - 1; // Happens on fast-backward
+
+                distance = _.size(requiredPages) + loadingGap;
                 after = this.first().get("date").clone();
                 addFrom = 0;
 
@@ -494,11 +519,9 @@ $(function() {
                 }
 
                 if (chunksLOADIND) {
-                    var daysLOADING = chunksLOADIND * DAYS_PER_PAGE,
-                        containerWidth = parseInt(this.container.css('width'), 10),
-                        newContainerWidth = containerWidth + (daysLOADING * WidgetView.DAY_WIDTH);
+                    var daysLOADING = chunksLOADIND * DAYS_PER_PAGE;
 
-                    this.container.css('width', newContainerWidth + "px");
+                    this.increaseWidth(daysLOADING);
 
                     lastDayOfPage.view.$el.after(renderLOADING({
                         days: daysLOADING

@@ -41,17 +41,15 @@
                 newLeft = left + offset;
 
             if (settings.borders) {
-                var parentWidth = this.el.parent().width();
+                var maxLeft = 0;
 
-                if (newLeft > 0) {
-                    newLeft = 0;
+                if (newLeft > maxLeft) {
+                    newLeft = maxLeft;
                 } else {
-                    if (parentWidth - left >= this.el.width()) {
-                        var diff = newLeft + parentWidth;
+                    var minLeft = this.el.parent().width() - this.el.width();
 
-                        if (diff < 0) {
-                            newLeft -= diff;
-                        }
+                    if (newLeft < minLeft) {
+                        newLeft = minLeft;
                     }
                 }
             }
