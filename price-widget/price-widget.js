@@ -594,12 +594,12 @@ $(function() {
                     throw new Error("PriceWidget requires Movable plugin");
                 }
 
-                this.pricesContainer.movable(movable).on('move.moving', function(e) {
+                this.pricesContainer.movable(movable).on('move.moving', _.throttle(function() {
                     var left = self.pricesContainer.movable("getLeft"),
                         day = Math.floor(left / -AbstractWidgetView.DAY_WIDTH);
 
                     self.setDay(day);
-                });
+                }, 300));
             }
 
             return this;
