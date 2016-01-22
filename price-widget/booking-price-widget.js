@@ -30,7 +30,7 @@ $(function() {
             var finalPrice = this.get("price"),
                 checked = this.collection.checked();
 
-            if (checked.length && this.isChecked()) {
+            if (checked.length) {
                 _.each(this.get("prices"), function(price) {
                     if (checked.length >= price.nights) {
                         finalPrice = price.price;
@@ -192,20 +192,49 @@ $(function() {
             }
 
             collection.each(function(model) {
-                // Update final price on active checked days
-                if (!isCurrentModel(model) && model.isChecked() && model.get("isActive")) {
+                // Update final price on all days
+                if (!isCurrentModel(model)) {
                     model.view.render();
                 }
             });
 
             collection.selectionChanged();
-            collection.widget.model.lazyChange();
+            collection.widget.model.trigger("change");
         }
     });
 
     var DayCollection = PriceWidget.DayCollection.extend({
         view: DayView,
         model: Day,
+        /**
+         * Get days from currently active to next Longer stay discount
+         *
+         * @returns {Number}
+         */
+        daysToNextDiscount: function() {
+            var active = this.active(),
+                lastPrice;
+
+            _.find(active, function(day) {
+                var firstPriceOfDay = _.find(day.get("prices"), function(price) {
+                    return price.nights > active.length;
+                });
+
+                if (firstPriceOfDay) {
+                    lastPrice = firstPriceOfDay;
+
+                    return true; // Stop _.find on other days
+                } else {
+                    return false;
+                }
+            });
+
+            if (lastPrice) {
+                return lastPrice.nights - active.length;
+            } else {
+                return 0;
+            }
+        },
         /**
          * Get days to maximum discount available for current active days
          *
@@ -261,9 +290,7 @@ $(function() {
     });
 
     var Widget = PriceWidget.Widget.extend({
-        lazyChange: _.debounce(function() {
-            this.trigger('change');
-        }, 2000)
+        //
     });
 
     var WidgetView = PriceWidget.AbstractWidgetView.extend({

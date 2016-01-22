@@ -165,7 +165,8 @@ $(function() {
                 // Used in templates
                 date_SERVER: "",
                 date_LIST: "",
-                date_POPOVER: ""
+                date_POPOVER: "",
+                date_BOOKING: ""
             };
         },
         initialize: function(attributes, options) {
@@ -221,7 +222,8 @@ $(function() {
         formats: {
             SERVER:  "MM/DD/YYYY",    // "m/d/Y" = 01/20/2015
             LIST:    "ddd<br>DD MMM", // "D d M" = Mon 20 Jan
-            POPOVER: "DD MMM YYYY"    // "d M Y" = 20 Jan 2015
+            POPOVER: "DD MMM YYYY",   // "d M Y" = 20 Jan 2015
+            BOOKING: "Do MMMM YYYY"   // "jS F Y" = 20th January 2015
         }
     });
 
@@ -317,10 +319,6 @@ $(function() {
             var today = moment(),
                 firstDate = moment(_.first(models).id, Day.formats.SERVER),
                 diff = differenceDays(today, firstDate);
-
-            if (diff > 0) {
-                throw new Error("Date of first day is earlier than today");
-            }
 
             var pagesPending = Math.ceil(-diff / DAYS_PER_PAGE),
                 config = {},
