@@ -22,14 +22,15 @@ var PriceWidgetTest = (function() {
         /**
          * Check days have proper IDs
          *
+         * @param assert
          * @param {String} first
          * @param {Array} days
          */
-        this.checkDays = function(first, days) {
+        this.checkDays = function(assert, first, days) {
             var date = moment(first, this.FORMAT_SERVER);
 
             _.each(days, function(day) {
-                expect(day.id).toBe(date.format(self.FORMAT_SERVER));
+                assert.equal(day.id, date.format(self.FORMAT_SERVER));
                 date.add(1, "days");
             });
         };
@@ -37,21 +38,23 @@ var PriceWidgetTest = (function() {
         /**
          * Assert `day` and `page` properties of priceWidget
          *
+         * @param assert
          * @param {Number} day
          * @param {Number} page
          */
-        this.expectDayAndPage = function(day, page) {
-            expect(this.widget.day).toBe(day);
-            expect(this.widget.page).toBe(page);
+        this.assertDayAndPage = function(assert, day, page) {
+            assert.equal(this.widget.day, day, "Current day is valid");
+            assert.equal(this.widget.page, page, "Current page is valid");
         };
 
         /**
          * Assert amount od days in widget
          *
+         * @param assert
          * @param {Number} length
          */
-        this.expectDaysAmount = function(length) {
-            expect(this.days.length).toBe(length);
+        this.assertDaysAmount = function(assert, length) {
+            assert.equal(this.days.length, length, "Days amount is valid");
         };
 
         /**
@@ -59,20 +62,23 @@ var PriceWidgetTest = (function() {
          * Check length of days
          * Check id`s of each day
          *
+         * @param assert
          * @param {Number} length
          * @param {String} first Id [date] of first day
          */
-        this.expectConsistency = function(length, first) {
-            this.expectDaysAmount(length);
-            this.checkDays(first, this.days.models);
+        this.assertConsistency = function(assert, length, first) {
+            this.assertDaysAmount(assert, length);
+            this.checkDays(assert, first, this.days.models);
         };
 
         /**
          * Assert consistency of days
          * Take arrays of [<startDate>, <size>]
          * Example: .expectConsistencyBlocks(["04/08/2016", 21], ...)
+         *
+         * @param assert
          */
-        this.expectConsistencyBlocks = function() {
+        this.assertConsistencyBlocks = function(assert) {
             var blocks = _.toArray(arguments);
 
             _.each(blocks, function(block) {
@@ -90,14 +96,12 @@ var PriceWidgetTest = (function() {
 
                 var from = self.days.indexOf(first);
 
-                self.checkDays(start, self.days.slice(from, size));
+                self.checkDays(assert, start, self.days.slice(from, size));
             });
         };
 
-        this.expectCurrentDay = function(expected) {
-            var current = this.widget.day;
-
-            expect(this.days.at(current).id).toBe(expected);
+        this.assertContainerPosition = function(assert, offset) {
+            //
         };
     };
 
