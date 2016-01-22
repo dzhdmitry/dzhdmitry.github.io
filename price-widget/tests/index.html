@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PriceWidget Tests</title>
+
+    <link rel="shortcut icon" type="image/png" href="jasmine/jasmine_favicon.png">
+    <link rel="stylesheet" type="text/css" href="jasmine/jasmine.css">
+    <link href="../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../price-widget.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Price widget</h1>
+
+        <div class="price-widget-container">
+            <div id="widget-today"></div>
+        </div>
+
+        <div class="price-widget-container">
+            <div id="widget-past"></div>
+        </div>
+
+        <div class="price-widget-container">
+            <div id="widget-future"></div>
+        </div>
+    </div>
+
+    <script id="widget-template" type="text/html">
+        <div class="btn-group-vertical btn-group-left hidden-xs" role="group">
+            <a href="#" class="btn widget-action widget-action-backward" title="Go back 1 week">
+                <span class="glyphicon glyphicon-step-backward"></span>
+            </a>
+
+            <a href="#" class="btn widget-action widget-action-fast-backward" title="Go back 1 month">
+                <span class="glyphicon glyphicon-fast-backward"></span>
+            </a>
+        </div>
+
+        <div class="btn-group-vertical btn-group-right hidden-xs" role="group">
+            <a href="#" class="btn widget-action widget-action-forward" title="Go forward 1 week">
+                <span class="glyphicon glyphicon-step-forward"></span>
+            </a>
+
+            <a href="#" class="btn widget-action widget-action-fast-forward" title="Go forward 1 month">
+                <span class="glyphicon glyphicon-fast-forward"></span>
+            </a>
+        </div>
+
+        <div class="panel panel-default price-widget">
+            <div class="panel-body">
+                <div class="prices-container"></div>
+            </div>
+
+            <div class="panel-footer visible-xs">
+                <div class="btn-group btn-group-justified">
+                    <a href="#" class="btn widget-action widget-action-fast-backward" title="Go back 1 month">
+                        <span class="glyphicon glyphicon-fast-backward"></span>
+                    </a>
+
+                    <a href="#" class="btn widget-action widget-action-backward" title="Go back 1 week">
+                        <span class="glyphicon glyphicon-step-backward"></span>
+                    </a>
+
+                    <a href="#" class="btn widget-action widget-action-forward" title="Go forward 1 week">
+                        <span class="glyphicon glyphicon-step-forward"></span>
+                    </a>
+
+                    <a href="#" class="btn widget-action widget-action-fast-forward" title="Go forward 1 month">
+                        <span class="glyphicon glyphicon-fast-forward"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script id="day-template" type="text/html">
+        <div class="panel-heading">
+            <%= date_LIST %>
+        </div>
+
+        <div class="panel-body day-<%= type %>">
+            <% if (type == "sold") { %>
+            SOLD
+            <% } else if (type == "poa") { %>
+            Enquire
+            <% } else { %>
+            <% if (price) { %>
+            <%= currency %><%= price %>
+            <% } else { %>
+            &nbsp;
+            <% } %>
+            <% } %>
+        </div>
+
+        <div class="panel-footer">
+            <div class="day-discount">
+                <% if (discount) { %>
+                -<%= discount %>%
+                <% } else { %>
+                &nbsp;
+                <% } %>
+            </div>
+        </div>
+    </script>
+
+    <script id="day-booking-template" type="text/html">
+        <div class="panel-heading">
+            <%= date_LIST %>
+        </div>
+
+        <div class="panel-body day-<%= type %><% if (isActive) { %> day-active<% } %>">
+            <% if (type == "sold") { %>
+            SOLD
+            <% } else if (type == "poa") { %>
+            Enquire
+            <% } else { %>
+            <% if (finalPrice) { %>
+            <%= currency %><%= finalPrice %>
+            <% } else { %>
+            &nbsp;
+            <% } %>
+            <% } %>
+        </div>
+
+        <div class="panel-footer">
+            <div class="day-discount">
+                <% if (discount) { %>
+                -<%= discount %>%
+                <% } else { %>
+                &nbsp;
+                <% } %>
+            </div>
+
+            <div class="day-booking">
+                <input type="checkbox" name="days[]" value="<%= date_SERVER %>" <% if (isChecked) { %> checked<% } %><% if (type == "poa" || type == "sold") { %> disabled<% } %>>
+            </div>
+        </div>
+    </script>
+
+    <script id="day-loading-template" type="text/html">
+        <% _.times(days, function() { %>
+        <div class="panel panel-day day-loading"></div>
+        <% }); %>
+    </script>
+
+    <script id="day-popover-template" type="text/html">
+        <div class="popover popover-day" role="tooltip">
+            <div class="arrow"></div>
+
+            <div class="popover-content"></div>
+        </div>
+    </script>
+
+    <script id="day-popover-content-template" type="text/html">
+        <%= date_POPOVER %>
+
+        <br>
+
+        <% _.each(prices, function(dayPrice) { %>
+        <%= currency %><%= dayPrice.price %> per night,
+        min <%= dayPrice.nights %> night<% if (dayPrice.nights != 1) { %>s<% } %>
+        <br>
+        <% }); %>
+    </script>
+
+    <script id="property-tooltip-template" type="text/html">
+        <div class="property-infoWindow row">
+            <% if (_.isEmpty(image)) { %>
+            <div class="col-xs-12">
+                <a href="<%= url %>"><%= _.escape(name) %></a>
+                <p><%= description %></p>
+            </div>
+            <% } else { %>
+            <div class="col-xs-3">
+                <img src="<%= image %>" alt="<%= _.escape(name) %>" />
+            </div>
+
+            <div class="col-xs-9">
+                <a href="<%= url %>"><%= _.escape(name) %></a>
+                <p><%= description %></p>
+            </div>
+            <% } %>
+        </div>
+    </script>
+
+    <!-- PriceWidget -->
+    <script src="../../js/jquery-2.1.4.min.js" type="text/javascript"></script>
+    <script src="../../js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="../../js/underscore-min.js" type="text/javascript"></script>
+    <script src="../../js/backbone-min.js" type="text/javascript"></script>
+    <script src="../../js/moment.js" type="text/javascript"></script>
+    <script src="../../common.js" type="text/javascript"></script>
+    <script src="../../movable/movable.js" type="text/javascript"></script>
+    <script src="../ajax.js" type="text/javascript"></script>
+    <script src="../price-widget.js" type="text/javascript"></script>
+
+    <!-- Jasmine -->
+    <script type="text/javascript" src="jasmine/jasmine.js"></script>
+    <script type="text/javascript" src="jasmine/jasmine-html.js"></script>
+    <script type="text/javascript" src="jasmine/boot.js"></script>
+
+    <!-- Test cases -->
+    <script type="text/javascript" src="price-widget-test.js"></script>
+    <script type="text/javascript" src="tests.js"></script>
+</body>
+</html>

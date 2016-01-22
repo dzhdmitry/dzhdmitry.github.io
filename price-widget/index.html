@@ -218,7 +218,7 @@
         ];
 
         $(function() {
-            var FORMAT_SERVER = "MM/DD/YYYY",
+            var FORMAT_SERVER = PriceWidget.Day.formats.SERVER,
                 $w1 = $('#widget1'),
                 $w2 = $('#widget2'),
                 day = moment().add(30, "days");
@@ -229,7 +229,12 @@
                 day.add(1, 'days');
 
                 return _.extend({}, item, {
-                    id: id
+                    id: id,
+					prices: [
+						{nights:2, price:205, original:205, isCurrent:true},
+						{nights:3, price:200, original:200, isCurrent:false},
+						{nights:4, price:190, original:190, isCurrent:false}
+					]
                 });
             });
 
