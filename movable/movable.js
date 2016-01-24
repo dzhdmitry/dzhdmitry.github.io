@@ -60,8 +60,8 @@
         };
 
         this.set = function(option, value) {
-            if (_.isObject(value)) {
-                settings = _.extend({}, settings, value);
+            if (_.isObject(option)) {
+                settings = _.extend({}, settings, option);
             } else {
                 settings[option] = value;
             }

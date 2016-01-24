@@ -52,7 +52,7 @@
     }
 
     $.ajax = function(options) {
-        var Promise = function(promiseSettings) {
+        var Promise = function() {
             var done,
                 fail,
                 always;
@@ -126,7 +126,7 @@
                         if (_.isFunction(always)) {
                             always.call(self);
                         }
-                    }, promiseSettings.delay);
+                    }, _.random(ajaxSettings.REQUEST_DELAY.min, ajaxSettings.REQUEST_DELAY.max));
                 } else {
                     if (_.isFunction(fail)) {
                         fail.call(self);
@@ -139,16 +139,14 @@
             };
         };
 
-        var promise = new Promise({
-            delay: _.random(ajaxSettings.REQUEST_DELAY.min, ajaxSettings.REQUEST_DELAY.max)
-        });
+        var promise = new Promise();
 
         return promise.__run__();
     };
 
     $.ajax.set = function(option, value) {
-        if (_.isObject(value)) {
-            ajaxSettings = _.extend({}, settings, value);
+        if (_.isObject(option)) {
+            ajaxSettings = _.extend({}, ajaxSettings, option);
         } else {
             ajaxSettings[option] = value;
         }

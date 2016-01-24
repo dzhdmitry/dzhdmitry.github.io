@@ -18,9 +18,10 @@ $(function() {
      * @returns {Number}
      */
     function differenceDays(first, second) {
-        var diff = first.clone().diff(second);
+        var diff = first.clone().diff(second),
+            days = moment.duration(diff).asDays();
 
-        return moment.duration(diff).get("d");
+        return Math.round(days);
     }
 
     /**
@@ -315,24 +316,7 @@ $(function() {
                 throw new Error("Widget must be initialized with at least " + DAYS_PER_PAGE + " days");
             }
 
-            // Performing PagesInfo
-            var today = moment(),
-                firstDate = moment(_.first(models).id, Day.formats.SERVER),
-                diff = differenceDays(today, firstDate);
-
-            var pagesPending = Math.ceil(-diff / DAYS_PER_PAGE),
-                config = {},
-                loaded = length / DAYS_PER_PAGE;
-
-            _.each(_.range(0, pagesPending), function(x) {
-                config[x] = DayCollection.PAGE_PENDING;
-            });
-
-            _.each(_.range(pagesPending, pagesPending + loaded), function(x) {
-                config[x] = DayCollection.PAGE_LOADED;
-            });
-
-            this.pages = new PagesInfo(config);
+            this.initializePages(models);
 
             // Prepend LOADINGs if first date is not today
             var pendingPagesAmount = this.pages.getPendingAmount(),
@@ -359,6 +343,34 @@ $(function() {
             } else {
                 this.minDay = 0;
             }
+        },
+        /**
+         * Create PagesInfo for a DayCollection. Runs once on DayCollection::initialize()
+         *
+         * @param {Array} models
+         */
+        initializePages: function(models) {
+            var DAYS_PER_PAGE = this.widget.getDaysPerPage(),
+                today = moment(),
+                firstDate = moment(_.first(models).id, Day.formats.SERVER),
+                diff = differenceDays(today, firstDate),
+                pagesPending = Math.ceil(-diff / DAYS_PER_PAGE),
+                config = {},
+                loaded = models.length / DAYS_PER_PAGE;
+
+            if (pagesPending < 0) {
+                pagesPending = 0;
+            }
+
+            _.each(_.range(0, pagesPending), function(x) {
+                config[x] = DayCollection.PAGE_PENDING;
+            });
+
+            _.each(_.range(pagesPending, pagesPending + loaded), function(x) {
+                config[x] = DayCollection.PAGE_LOADED;
+            });
+
+            this.pages = new PagesInfo(config);
         },
         /**
          * Increase width of days container depending on days width
@@ -547,6 +559,7 @@ $(function() {
                 url: "",
                 days: [],
                 DAYS_PER_PAGE: 7,
+                ANIMATION_RATIO: 1,
                 movable: true // <false> if movable is not needed, <object> options for $.fn.movable, <true> for default
             };
         },
@@ -665,6 +678,8 @@ $(function() {
                     duration *= 1.4;
                 }
             }
+
+            duration *= this.model.get("ANIMATION_RATIO");
 
             this.pricesContainer.animate({
                 left: "-" + containerOffset + "px"

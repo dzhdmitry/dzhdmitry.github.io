@@ -6,11 +6,9 @@ var PriceWidgetTest = (function() {
      * @constructor
      */
     var Test = function(options) {
-        var self = this;
-
         this.FORMAT_SERVER = options.FORMAT_SERVER;
         this.widget = options.widget;
-        this.days = priceWidgetToday.model.days;
+        this.days = options.widget.model.days;
 
         this.buttons = {
             forward: options.widget.$('a.widget-action-forward').eq(0),
@@ -27,10 +25,11 @@ var PriceWidgetTest = (function() {
          * @param {Array} days
          */
         this.checkDays = function(assert, first, days) {
-            var date = moment(first, this.FORMAT_SERVER);
+            var self = this,
+                date = moment(first, this.FORMAT_SERVER);
 
             _.each(days, function(day) {
-                assert.equal(day.id, date.format(self.FORMAT_SERVER));
+                assert.equal(day.id, date.format(self.FORMAT_SERVER), "Day `" + day.id + "` is valid");
                 date.add(1, "days");
             });
         };
@@ -77,9 +76,10 @@ var PriceWidgetTest = (function() {
          * Example: .expectConsistencyBlocks(["04/08/2016", 21], ...)
          *
          * @param assert
+         * @param {Array} blocks
          */
-        this.assertConsistencyBlocks = function(assert) {
-            var blocks = _.toArray(arguments);
+        this.assertConsistencyBlocks = function(assert, blocks) {
+            var self = this;
 
             _.each(blocks, function(block) {
                 if (block.length !== 2) {
@@ -96,12 +96,35 @@ var PriceWidgetTest = (function() {
 
                 var from = self.days.indexOf(first);
 
-                self.checkDays(assert, start, self.days.slice(from, size));
+                self.checkDays(assert, start, self.days.slice(from, from + size));
             });
         };
 
         this.assertContainerPosition = function(assert, offset) {
             //
+        };
+
+        this.assertPages = function(assert, pages) {
+            var $elements = this.days.container.find('.panel-day'),
+                DAYS_PER_PAGE = this.widget.model.get("DAYS_PER_PAGE");
+
+            _.each(pages, function(loaded, page) {
+                var from = page * DAYS_PER_PAGE,
+                    pageDays = $elements.slice(from, from + DAYS_PER_PAGE),
+                    allDaysLoaded = true,
+                    allDaysLoading = true;
+
+                _.each(pageDays, function(pageDay) {
+                    var isLoading = $(pageDay).hasClass("day-loading"),
+                        isLoaded = !isLoading;
+
+                    allDaysLoading &= isLoading;
+                    allDaysLoaded &= isLoaded;
+                });
+
+                assert.notEqual(allDaysLoaded, allDaysLoading, "All days of #" + page + " page must be loaded or loading");
+                assert.equal(allDaysLoaded, loaded, "All days of #" + page + " page must be (not) loaded");
+            });
         };
     };
 
