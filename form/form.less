@@ -1,0 +1,67 @@
+@import (reference) "custom-controls";
+
+@font-size: 12px;
+
+@color-white: #fff;
+@color-green: #6daf34;
+
+body {
+    padding-bottom: 50px;
+    background-color: #eee;
+}
+
+.controls-form {
+    padding: 20px;
+}
+
+.form-green {
+    background-color: @color-green;
+    color: @color-white;
+
+    input[type="checkbox"] {
+        .custom-checkbox(@font-size, @color-white, @color-green);
+    }
+
+    input[type="radio"] {
+        .custom-radio(@font-size, @color-white, @color-green);
+    }
+}
+
+.form-white {
+    background-color: @color-white;
+    color: @color-green;
+
+    input[type="checkbox"] {
+        .custom-checkbox(@font-size, @color-green, @color-white);
+    }
+
+    input[type="radio"] {
+        .custom-radio(@font-size, @color-green, @color-white);
+    }
+}
+
+.form-green-no-border {
+    background-color: @color-green;
+    color: @color-white;
+
+    input[type="checkbox"] {
+        .custom-checkbox(@font-size, @color-green, @color-white, 0);
+    }
+
+    input[type="radio"] {
+        .custom-radio(@font-size, @color-green, @color-white, 0);
+    }
+}
+
+.form-white-no-border {
+    background-color: @color-white;
+    color: @color-green;
+
+    input[type="checkbox"] {
+        .custom-checkbox(@font-size, @color-white, @color-green, 0);
+    }
+
+    input[type="radio"] {
+        .custom-radio(@font-size, @color-white, @color-green, 0);
+    }
+}

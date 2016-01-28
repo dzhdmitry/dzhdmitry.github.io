@@ -1,0 +1,54 @@
+.custom-choice(@size, @color, @colorBackground, @outerBorder: 1px) {
+    @increment: 2px;
+    @border: @increment * 2;
+
+    height: @size;
+    width: @size;
+
+    &:before, &:after {
+        content: "";
+        cursor: pointer;
+    }
+
+    &:before {
+        display: block;
+        width: @size + @border;
+        height: @size + @border;
+        margin-left: -@increment;
+        margin-top: -@increment;
+        background-color: @colorBackground;
+        border: @outerBorder solid @color;
+    }
+
+    &:after {
+        position: absolute;
+        top: 0;
+        left: 0;
+
+        width: @size - @border;
+        height: @size - @border;
+        margin: @increment;
+    }
+
+    &:checked {
+        &:after {
+            background-color: @color;
+        }
+    }
+}
+
+.custom-checkbox(@size, @color, @colorBackground, @border: 1px) {
+    .custom-choice(@size, @color, @colorBackground, @border);
+
+    &:before, &:after {
+        border-radius: 1px;
+    }
+}
+
+.custom-radio(@size, @color, @colorBackground, @border: 1px) {
+    .custom-choice(@size, @color, @colorBackground, @border);
+
+    &:before, &:after {
+        border-radius: 50%;
+    }
+}
