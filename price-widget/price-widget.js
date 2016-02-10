@@ -173,12 +173,21 @@ $(function() {
         initialize: function(attributes, options) {
             var self = this;
 
+            // Manually set date_SERVER, date_* fields
             _.each(Day.formats, function(format, name) {
                 self.set("date_" + name, self.getDate(format));
             });
 
             this.set("date", moment(this.id, Day.formats.SERVER));
 
+            // Replace original price by 2nd if needed (see AASUP-245)
+            if (this.collection.widget.model.get("showSecondPriceIfPossible")) {
+                if (_.has(attributes, "prices") && attributes.prices.length >= 3) {
+                    this.set("price", attributes.prices[1].price);
+                }
+            }
+
+            // Manually create view
             var view = new this.collection.view({model: this}),
                 el = view.render().el;
 
@@ -198,7 +207,7 @@ $(function() {
                 var duration = differenceDays(this.get("date"), anchor.get("date")),
                     $replacement = $loading.eq(Math.abs(duration) - 1);
 
-                if ($replacement.hasClass(DAY_LOADING_CLASS)) {
+                if ($replacement.length && $replacement.hasClass(DAY_LOADING_CLASS)) {
                     $replacement.replaceWith(el);
                 }
             } else {
@@ -316,11 +325,15 @@ $(function() {
                 throw new Error("Widget must be initialized with at least " + DAYS_PER_PAGE + " days");
             }
 
-            this.initializePages(models);
+            var today = moment(),
+                firstDate = moment(_.first(models).id, Day.formats.SERVER),
+                diff = differenceDays(today, firstDate);
+
+            this.initializePages(models, diff);
 
             // Prepend LOADINGs if first date is not today
             var pendingPagesAmount = this.pages.getPendingAmount(),
-                pendingDays = pendingPagesAmount * this.widget.getDaysPerPage();
+                pendingDays = pendingPagesAmount * DAYS_PER_PAGE;
 
             this.increaseWidth(pendingDays + models.length + 15);
 
@@ -348,12 +361,10 @@ $(function() {
          * Create PagesInfo for a DayCollection. Runs once on DayCollection::initialize()
          *
          * @param {Array} models
+         * @param {Number} diff
          */
-        initializePages: function(models) {
+        initializePages: function(models, diff) {
             var DAYS_PER_PAGE = this.widget.getDaysPerPage(),
-                today = moment(),
-                firstDate = moment(_.first(models).id, Day.formats.SERVER),
-                diff = differenceDays(today, firstDate),
                 pagesPending = Math.ceil(-diff / DAYS_PER_PAGE),
                 config = {},
                 loaded = models.length / DAYS_PER_PAGE;
@@ -558,6 +569,7 @@ $(function() {
                 minNights: 1,
                 url: "",
                 days: [],
+                showSecondPriceIfPossible: false, // If =<true> AND property have 3+ base prices, widget must show 2nd price
                 DAYS_PER_PAGE: 7,
                 ANIMATION_RATIO: 1,
                 movable: true // <false> if movable is not needed, <object> options for $.fn.movable, <true> for default
@@ -565,6 +577,17 @@ $(function() {
         },
         pageChanged: function(page) {
             this.days.loadRequiredPages(page);
+        },
+        isPoa: function() {
+            if (this.days.length) {
+                var day = this.days.at(0);
+
+                if (day.isType("poa")) {
+                    return true;
+                }
+            }
+
+            return false;
         }
     });
 
@@ -812,7 +835,8 @@ $(function() {
         $this.priceWidget({
             minNights: data.minNights || 1,
             url: data.url,
-            days: data.days
+            days: data.days,
+            showSecondPriceIfPossible: true
         });
     });
 });

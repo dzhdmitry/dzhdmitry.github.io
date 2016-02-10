@@ -39,26 +39,6 @@ $(function() {
             }
 
             return finalPrice;
-        },
-        /**
-         * Get max nights for all prices of a day
-         *
-         * @returns {Number}
-         */
-        getMaxNights: function() {
-            if (this.isType("available")) {
-                var maxNights = 1;
-
-                _.each(this.get("prices"), function(price) {
-                    if (price.nights > maxNights) {
-                        maxNights = price.nights;
-                    }
-                });
-
-                return maxNights;
-            } else {
-                return 0;
-            }
         }
     });
 
@@ -236,25 +216,6 @@ $(function() {
             }
         },
         /**
-         * Get days to maximum discount available for current active days
-         *
-         * @returns {Number}
-         */
-        daysToMaxDiscount: function() {
-            var active = this.active(),
-                daysToMaxDiscount = 0;
-
-            _.each(active, function(day) {
-                var diff = day.getMaxNights() - active.length;
-
-                if (diff > daysToMaxDiscount) {
-                    daysToMaxDiscount = diff;
-                }
-            });
-
-            return daysToMaxDiscount;
-        },
-        /**
          * Booking is allowed if user checked more then or equal to minNights for a property
          *
          * @returns {Boolean}
@@ -309,6 +270,35 @@ $(function() {
             this.model.days = new DayCollection(this.model.get("days"), {
                 widget: this
             });
+
+            // Looking for gaps in checked selection
+            var checkedFound = false,
+                startFound = false,
+                endFound = false;
+
+            this.model.days.each(function(day) {
+                if (day.isChecked()) {
+                    checkedFound = true;
+
+                    if (startFound) {
+                        endFound = true;
+                    }
+                }
+
+                if (day.isType("sold") && checkedFound) {
+                    startFound = true;
+                }
+            });
+
+            // If gap found - uncheck all
+            if (endFound) {
+                _.each(this.model.days.checked(), function(day) {
+                    day.set("isChecked", false);
+                });
+            }
+
+            // Update `isActive` due to selection
+            this.model.days.selectionChanged();
 
             return this;
         }
