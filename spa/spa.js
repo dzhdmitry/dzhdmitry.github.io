@@ -15,7 +15,8 @@
             this.listenTo(this.model, 'change', this.render);
         },
         /**
-         * Override this function
+         * Must be overridden.
+         * Receives model attributes and return rendered string.
          *
          * @param {Object} data
          * @returns {String}
@@ -23,6 +24,11 @@
         template: function(data) {
             return "";
         },
+        /**
+         * Renders model attributes by .template() and toggles the container by model's `active` attribute.
+         *
+         * @returns {SPA.View}
+         */
         render: function() {
             var html = this.template(this.model.toJSON());
 
@@ -31,6 +37,12 @@
 
             return this;
         },
+        /**
+         * Set `display: block` css style to page container if `active=true`, or `display:none` if false.
+         * Override it to use different behaviour.
+         *
+         * @param {Boolean} active
+         */
         toggle: function(active) {
             var display = active ? "block" : "none";
 
@@ -40,15 +52,23 @@
 
     SPA.Model = Backbone.Model.extend({
         defaults: {
-            name: "",     // One of script#template-page-<name>
-            active: true, // View is `display:block` if true, `hidden` if false
-            title: ""     // Will be set as document title when page is active
-            // all page attributes accessible in template
+            name: "",     // Name/type of page. Use it to find a template for page
+            active: true, // Indicates visibility of a page. When true, page container is set `display: block` css style, and `display:none` if false
+            title: ""     // Will be set to document's title when page is shown
+            // All model's attributes are available in `view.template()`
         },
+        /**
+         * Set `page.active` property to `true` (must cause view rendering) and copy page's title to document.
+         * Causes view.render().
+         */
         show: function() {
             this.set("active", true);
             $('title').html(this.get("title"));
         },
+        /**
+         * Set `page.active` property to `false`.
+         * Causes `view.render()`.
+         */
         hide: function() {
             this.set("active", false);
         }
@@ -57,19 +77,11 @@
     SPA.Collection = Backbone.Collection.extend({
         model: SPA.Model,
         view: SPA.View,
-        initialize: function(models, options) {
-            var self = this;
-
-            this.on('add', function(model) {
-                var view = new self.view({model: model});
-
-                options.container.append(view.render().el);
-            });
-        },
         /**
-         * Open page with given uri and hide others
+         * Open page with given uri and hide others.
+         * Find page with `id=uri`, `show()` this page, `.hide()` other pages.
          *
-         * @param uri
+         * @param {String} uri
          */
         open: function(uri) {
             this.each(function(page) {
@@ -85,17 +97,21 @@
     SPA.Router = Backbone.Router.extend({
         collection: SPA.Collection,
         initialize: function(options) {
-            var defaults = {
-                el: $('body'),
-                pushState: false,
-                root: '/'
-            };
-
-            var settings = _.extend({}, defaults, options);
+            var self = this,
+                defaults = {
+                    el: $('body'),
+                    pushState: false,
+                    root: '/'
+                },
+                settings = _.extend({}, defaults, options);
 
             this.pushState = settings.pushState;
-            this.pages = new this.collection([], {
-                container: settings.el
+            this.pages = new this.collection();
+
+            this.listenTo(this.pages, 'add', function(model) {
+                var view = new self.pages.view({model: model});
+
+                settings.el.append(view.render().el);
             });
 
             Backbone.history.start({
@@ -106,7 +122,8 @@
             SPA.Router.__super__.initialize.call(this, options);
         },
         /**
-         * Go to page with specified name
+         * Read document uri and activate page with given `attributes` (PlainObject).
+         * If page not exists in collection, it will be created and added to collection with id=uri.
          *
          * @param {Object} attributes Contains name, title, ...
          */
