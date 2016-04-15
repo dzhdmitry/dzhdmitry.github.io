@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SPA Example</title>
+
+    <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.3.3/backbone-min.js"></script>
+    <script src="spa.js"></script>
+    <script src="script.js" type="text/javascript"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <style>
+        #viewport {
+            background-color: #eee;
+            height: 200px;
+        }
+
+        .viewport-page {
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>SPA Example</h1>
+
+    <div class="row">
+        <div class="col-sm-4">
+            <ul>
+                <li>
+                    <a href="#!/">Home</a>
+                </li>
+
+                <li>
+                    <a href="#!/discovery">Discovery</a>
+                </li>
+
+                <li>
+                    <a href="#!/introduction">Introduction</a>
+                </li>
+
+                <li>
+                    <a href="#!/product/First">First product</a>
+                </li>
+
+                <li>
+                    <a href="#!/product/Second">Second product</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="viewport"></div>
+</div>
+
+<script type="text/html" id="template-page-home">
+    <h1>Home</h1>
+
+    <p>
+        Content
+    </p>
+</script>
+
+<script type="text/html" id="template-page-discovery">
+    <h1>Discovery</h1>
+
+    <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris dignissim neque eu turpis pellentesque molestie.
+        Mauris tempus euismod o.rci dapibus hendrerit.
+        Nulla gravida lorem id consectetur suscipit.
+    </p>
+</script>
+
+<script type="text/html" id="template-page-introduction">
+    <h1>Introduction</h1>
+
+    <p>
+        name: <%= name %><br>
+        title: <%= title %><br>
+        is active: <% if (active) { %>yes<% } else {%>no<% } %>
+    </p>
+</script>
+
+<script type="text/html" id="template-page-product">
+    <h1>Product</h1>
+
+    <p>
+        Product name: <%= _.escape(productName) %>
+    </p>
+</script>
+
+</body>
+</html>
