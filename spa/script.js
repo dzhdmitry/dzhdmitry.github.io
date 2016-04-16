@@ -52,27 +52,6 @@ $(function() {
     });
 
     var router = new app.Router({
-        el: $('#viewport')/*,
-        pushState: true,
-        root: '/spa/'*/
+        el: $('#viewport')
     });
-
-    /*$(document).on('click', 'a.spa-link', function(e) {
-        if (!e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
-            e.preventDefault();
-
-            var $target = $(this),
-                url = $target.attr("href").replace(/^\//,'').replace('\#\!\/','');
-
-            router.navigate(url, {
-                trigger: true
-            });
-
-            setTimeout(function() {
-                $target.blur();
-            }, 100);
-
-            return false;
-        }
-    });*/
 });

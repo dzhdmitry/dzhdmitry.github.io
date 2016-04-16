@@ -1,13 +1,31 @@
+/*! Single page application framework - v0.1.1 - 2016-04-15
+* https://github.com/dzhdmitry/spa
+* Copyright (c) 2016 Dmitry Dzhuleba;
+* Licensed MIT
+*/
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
-        // AMD.
         define(['jquery', 'underscore', 'backbone'], factory);
     } else {
-        // Browser globals.
         root.SPA = factory(root.$, root._, root.Backbone);
     }
 }(this, function($, _, Backbone) {
     var SPA = {};
+
+    if (!$) {
+        console.error("jQuery is required by SPA");
+        return;
+    }
+
+    if (!_) {
+        console.error("Underscore is required by SPA");
+        return;
+    }
+
+    if (!Backbone) {
+        console.error("Backbone is required by SPA");
+        return;
+    }
 
     SPA.View = Backbone.View.extend({
         tagName: "div",
