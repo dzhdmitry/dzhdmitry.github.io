@@ -1,21 +1,16 @@
-/*! Single page application framework - v0.1.3 - 2016-04-16
+/*! Single page application framework - v0.1.5 - 2016-04-16
 * https://github.com/dzhdmitry/spa
 * Copyright (c) 2016 Dmitry Dzhuleba;
 * Licensed MIT
 */
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
-        define(['jquery', 'underscore', 'backbone'], factory);
+        define(['underscore', 'backbone'], factory);
     } else {
-        root.SPA = factory(root.$, root._, root.Backbone);
+        root.SPA = factory(root._, root.Backbone);
     }
-}(this, function($, _, Backbone) {
+}(this, function(_, Backbone) {
     var SPA = {};
-
-    if (!$) {
-        console.error("jQuery is required by SPA");
-        return;
-    }
 
     if (!_) {
         console.error("Underscore is required by SPA");
@@ -69,6 +64,7 @@
     });
 
     SPA.Model = Backbone.Model.extend({
+        idAttribute: "uri",
         defaults: {
             name: "",     // Name/type of page. Use it to find a template for page
             active: true, // Indicates visibility of a page. When true, page container is set `display: block` css style, and `display:none` if false
@@ -81,7 +77,7 @@
          */
         show: function() {
             this.set("active", true);
-            $('title').html(this.get("title"));
+            Backbone.$('title').html(this.get("title"));
         },
         /**
          * Set `page.active` property to `false`.
@@ -97,13 +93,13 @@
         view: SPA.View,
         /**
          * Open page with given uri and hide others.
-         * Find page with `id=uri`, `show()` this page, `.hide()` other pages.
+         * Find and `show()` page with uri, `hide()` other pages.
          *
          * @param {String} uri
          */
         open: function(uri) {
             this.each(function(page) {
-                if (page.id == uri) {
+                if (page.get("uri") == uri) {
                     page.show();
                 } else {
                     page.hide();
@@ -117,7 +113,7 @@
         initialize: function(options) {
             var self = this,
                 defaults = {
-                    el: $('body'),
+                    el: Backbone.$('body'),
                     start: true,
                     pushState: false,
                     root: '/'
@@ -154,16 +150,16 @@
         },
         /**
          * Read document uri and activate page with given `attributes` (PlainObject).
-         * If page not exists in collection, it will be created and added to collection with id=uri.
+         * If page not exists in collection, it will be created with given `attributes`, and added to collection.
          *
          * @param {Object} attributes Contains name, title, ...
          */
         go: function(attributes) {
             var uri = (this.pushState) ? Backbone.history.getPath() : Backbone.history.getHash(),
-                model = _.extend({id: uri}, attributes);
+                model = _.extend({uri: uri}, attributes);
 
             this.pages.add(model);
-            this.pages.open(model.id);
+            this.pages.open(model.uri);
         }
     });
 

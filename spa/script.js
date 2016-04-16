@@ -26,6 +26,7 @@ $(function() {
         },
         home: function() {
             this.go({
+                uri: "/",
                 name: "home",
                 title: 'Home &ndash; SPA Example'
             });
