@@ -50,11 +50,11 @@
                 </li>
 
                 <li>
-                    <a href="#!/discovery">Discovery</a>
+                    <a href="#!/static">Static</a>
                 </li>
 
                 <li>
-                    <a href="#!/introduction">Introduction</a>
+                    <a href="#!/dynamic">Dynamic</a>
                 </li>
 
                 <li>
@@ -77,35 +77,62 @@
     <h1>Home</h1>
 
     <p>
-        Content
-    </p>
-</script>
-
-<script type="text/html" id="template-page-discovery">
-    <h1>Discovery</h1>
-
-    <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris dignissim neque eu turpis pellentesque molestie.
-        Mauris tempus euismod o.rci dapibus hendrerit.
-        Nulla gravida lorem id consectetur suscipit.
-    </p>
-</script>
-
-<script type="text/html" id="template-page-introduction">
-    <h1>Introduction</h1>
-
-    <p>
         name: <%= name %><br>
         title: <%= title %><br>
         is active: <% if (active) { %>yes<% } else {%>no<% } %>
     </p>
 </script>
 
+<script type="text/html" id="template-page-static">
+    <h1>Static</h1>
+
+    <p>
+        Content of this page must be static.
+    </p>
+
+    <form>
+        <div class="form-group row">
+            <div class="col-sm-8">
+                <select class="form-control">
+                    <option value="" disabled>Change me</option>
+                    <option value="1">First</option>
+                    <option value="2">Second</option>
+                    <option value="3">Third</option>
+                    <option value="4">Fourth</option>
+                </select>
+            </div>
+        </div>
+    </form>
+</script>
+
+<script type="text/html" id="template-page-dynamic">
+    <h1>Dynamic</h1>
+
+    <p>
+        Content of this page must be rendered each time page will be opened.
+    </p>
+
+    <form>
+        <div class="form-group row">
+            <div class="col-sm-8">
+                <select class="form-control">
+                    <option value="" disabled>Change me</option>
+                    <option value="1">First</option>
+                    <option value="2">Second</option>
+                    <option value="3">Third</option>
+                    <option value="4">Fourth</option>
+                </select>
+            </div>
+        </div>
+    </form>
+</script>
+
 <script type="text/html" id="template-page-product">
     <h1>Product</h1>
 
     <p>
-        Product name: <%= _.escape(productName) %>
+        Product name: <%= _.escape(productName) %>.<br>
+        Both pages use this template with different data.
     </p>
 </script>
 

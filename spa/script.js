@@ -20,8 +20,8 @@ $(function() {
         routes: {
             '': 'home',
             '!/': 'home',
-            '!/discovery': 'discovery',
-            '!/introduction': 'introduction',
+            '!/static': 'static',
+            '!/dynamic': 'dynamic',
             '!/product/:name': 'product'
         },
         home: function() {
@@ -31,16 +31,18 @@ $(function() {
                 title: 'Home &ndash; SPA Example'
             });
         },
-        discovery: function() {
+        static: function() {
             this.go({
-                name: "discovery",
-                title: 'Discovery &ndash; SPA Example'
+                name: "static",
+                title: 'Static &ndash; SPA Example'
             });
         },
-        introduction: function() {
+        dynamic: function() {
             this.go({
-                name: "introduction",
-                title: 'Introduction &ndash; SPA Example'
+                name: "dynamic",
+                title: 'Dynamic &ndash; SPA Example'
+            }, {
+                force: true
             });
         },
         product: function(name) {
