@@ -1,4 +1,4 @@
-/*! Single page application framework - v0.2.3 - 2016-04-18
+/*! Single page application framework - v0.2.6 - 2016-04-21
 * https://github.com/dzhdmitry/spa
 * Copyright (c) 2016 Dmitry Dzhuleba;
 * Licensed MIT
@@ -102,14 +102,25 @@
         model: SPA.Model,
         view: SPA.View,
         /**
-         * Create view for given model
+         * Create view for given model[s]
          *
-         * @param {SPA.Model} model
+         * @param {SPA.Model|SPA.Model[]} model
          */
         createView: function(model) {
-            var view = new this.view({model: model});
+            var self = this;
 
-            this.el.append(view.render().el);
+            function fn(page) {
+                var view = new self.view({model: page});
+
+                self.el.append(view.render().el);
+                view.toggleActive();
+            }
+
+            if (_.isArray(model)) {
+                _.each(model, fn);
+            } else {
+                fn(model);
+            }
         },
         /**
          * Open page with given uri and hide others.
@@ -135,7 +146,8 @@
                     el: Backbone.$('body'),
                     start: true,
                     pushState: false,
-                    root: '/'
+                    root: '/',
+                    pages: []
                 },
                 settings = _.extend({}, defaults, options);
 
@@ -148,6 +160,12 @@
                 collection.createView(model);
             });
 
+            this.listenTo(this.pages, 'reset', function(collection) {
+                collection.createView(collection.models);
+            });
+
+            this.pages.reset(settings.pages);
+
             if (settings.start) {
                 Backbone.history.start({
                     pushState: settings.pushState,
@@ -158,13 +176,19 @@
             SPA.Router.__super__.initialize.call(this, options);
         },
         /**
-         * Run `Backbone.history.start()` with options `pushState` and `root` provided in constructor
+         * Run `Backbone.history.start()` with options `pushState` and `root` provided in constructor.
          */
         start: function() {
             Backbone.history.start({
                 pushState: this.pushState,
                 root: this.root
             });
+        },
+        /**
+         * Stop watching uri changes (Run `Backbone.history.stop()`).
+         */
+        stop: function() {
+            Backbone.history.stop();
         },
         /**
          * Read document uri and activate page with given `attributes` (PlainObject).
@@ -175,27 +199,24 @@
          */
         go: function(attributes, options) {
             var uri = (this.pushState) ? Backbone.history.getPath() : Backbone.history.getHash(),
-                modelAttributes = _.extend({uri: uri}, attributes),
-                model;
+                modelAttributes = _.extend({uri: uri}, attributes);
 
             var settings = _.extend({}, {
                 force: false
             }, options);
 
             if (settings.force) {
-                model = this.pages.add(modelAttributes, {
+                var existsBefore = this.pages.has(modelAttributes.uri);
+
+                var model = this.pages.add(modelAttributes, {
                     merge: true
                 });
 
-                model.trigger("render");
-            } else {
-                var existsBefore = this.pages.has(modelAttributes.uri);
-
-                model = this.pages.add(modelAttributes);
-
-                if (!existsBefore) {
+                if (existsBefore) {
                     model.trigger("render");
                 }
+            } else {
+                this.pages.add(modelAttributes);
             }
 
             this.pages.open(modelAttributes.uri);
