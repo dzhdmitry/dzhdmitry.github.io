@@ -1,7 +1,7 @@
 $(function() {
     var app = {};
 
-    app.View = SPA.View.extend({
+    app.View = Viewport.View.extend({
         className: "viewport-page",
         template: function(data) {
             var template = $('#template-page-' + this.model.get("name")),
@@ -11,11 +11,11 @@ $(function() {
         }
     });
 
-    app.Collection = SPA.Collection.extend({
+    app.Collection = Viewport.Collection.extend({
         view: app.View
     });
 
-    app.Router = SPA.Router.extend({
+    app.Router = Viewport.Router.extend({
         collection: app.Collection,
         routes: {
             '': 'home',
@@ -28,19 +28,19 @@ $(function() {
             this.go({
                 uri: "/",
                 name: "home",
-                title: 'Home &ndash; SPA Example'
+                title: 'Home &ndash; Viewport Example'
             });
         },
         static: function() {
             this.go({
                 name: "static",
-                title: 'Static &ndash; SPA Example'
+                title: 'Static &ndash; Viewport Example'
             });
         },
         dynamic: function() {
             this.go({
                 name: "dynamic",
-                title: 'Dynamic &ndash; SPA Example'
+                title: 'Dynamic &ndash; Viewport Example'
             }, {
                 force: true
             });
@@ -48,7 +48,7 @@ $(function() {
         product: function(name) {
             this.go({
                 name: "product",
-                title: name + ' &ndash; SPA Example',
+                title: name + ' &ndash; Viewport Example',
                 productName: name
             });
         }

@@ -1,23 +1,28 @@
+/*! Single page application framework - v0.5.0 - 2017-01-03
+* https://github.com/dzhdmitry/spa
+* Copyright (c) 2017 Dmitry Dzhuleba;
+* Licensed MIT
+*/
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         define(['underscore', 'backbone'], factory);
     } else {
-        root.SPA = factory(root._, root.Backbone);
+        root.Viewport = factory(root._, root.Backbone);
     }
 }(this, function(_, Backbone) {
-    var SPA = {};
+    var Viewport = {};
 
     if (!_) {
-        console.error("Underscore is required by SPA");
+        console.error("Underscore is required by Backbone-Viewport");
         return;
     }
 
     if (!Backbone) {
-        console.error("Backbone is required by SPA");
+        console.error("Backbone is required by Backbone-Viewport");
         return;
     }
 
-    SPA.View = Backbone.View.extend({
+    Viewport.View = Backbone.View.extend({
         tagName: "div",
         initialize: function() {
             this.listenTo(this.model, 'render', this.render);
@@ -36,12 +41,13 @@
         /**
          * Renders model attributes by .template() and toggles the container by model's `active` attribute.
          *
-         * @returns {SPA.View}
+         * @returns {Viewport.View}
          */
         render: function() {
             var html = this.template(this.model.toJSON());
 
             this.$el.html(html);
+            this.trigger("rendered");
 
             return this;
         },
@@ -61,11 +67,10 @@
         }
     });
 
-    SPA.Model = Backbone.Model.extend({
+    Viewport.Model = Backbone.Model.extend({
         idAttribute: "uri",
         defaults: {
-            active: false, // Indicates visibility of a page. When true, page container is set `display: block` css style, and `display:none` if false
-            title: ""      // Will be set to document's title when page is shown
+            active: false // Indicates visibility of a page. When true, page container is set `display: block` css style, and `display:none` if false
             // All model's attributes are available in `view.template()`
         },
         getFetchOptions: function() {
@@ -75,12 +80,11 @@
             return "/" + this.get("uri");
         },
         /**
-         * Set `page.active` property to `true` (must cause view rendering) and copy page's title to document.
+         * Set `page.active` property to `true` (must cause view rendering).
          * Triggers `shown` event.
          */
         show: function() {
             this.set("active", true);
-            Backbone.$('title').html(this.get("title"));
 
             if (this.hasChanged("active")) {
                 this.trigger("shown");
@@ -99,13 +103,13 @@
         }
     });
 
-    SPA.Collection = Backbone.Collection.extend({
-        model: SPA.Model,
-        view: SPA.View,
+    Viewport.Collection = Backbone.Collection.extend({
+        model: Viewport.Model,
+        view: Viewport.View,
         /**
          * Create view for given model[s]
          *
-         * @param {SPA.Model|SPA.Model[]} model
+         * @param {Viewport.Model|Viewport.Model[]} model
          */
         createView: function(model) {
             var self = this;
@@ -128,7 +132,7 @@
          *
          * @param {Object} attributes
          * @param {Boolean} createView
-         * @returns {SPA.Model}
+         * @returns {Viewport.Model}
          */
         addPage: function(attributes, createView) {
             var model = this.add(attributes);
@@ -144,7 +148,7 @@
          *
          * @param {Object} attributes
          * @param {Boolean} createView
-         * @returns {*}
+         * @returns {Viewport.Model}
          */
         mergePage: function(attributes, createView) {
             var model = this.add(attributes, {
@@ -158,6 +162,26 @@
             }
 
             return model;
+        },
+        /**
+         * Add page with existing view
+         *
+         * @param {Object} attributes `uri` is mandatory
+         * @param {*} $el
+         * @returns {Viewport.Model}
+         */
+        pushPage: function(attributes, $el) {
+            var defaults = {
+                    active: true
+                },
+                modelAttributes = _.extend({}, defaults, attributes),
+                page = new this.model(modelAttributes),
+                view = new this.view({model: page});
+
+            view.setElement($el);
+            this.add(page);
+
+            return page;
         },
         /**
          * Open page with given uri and hide others.
@@ -176,54 +200,67 @@
         }
     });
 
-    SPA.Router = Backbone.Router.extend({
-        collection: SPA.Collection,
+    Viewport.Router = Backbone.Router.extend({
+        collection: Viewport.Collection,
         initialize: function(options) {
             var defaults = {
                     el: Backbone.$('body'),
                     start: true,
                     pushState: false,
+                    silent: false,
                     root: '/',
                     pages: []
                 },
                 settings = _.extend({}, defaults, options);
 
             this.pushState = settings.pushState;
+            this.silent = settings.silent;
             this.root = settings.root;
             this.pages = new this.collection();
             this.pages.el = settings.el;
 
             this.listenTo(this.pages, 'reset', function(collection) {
-                collection.each(function(m) {
-                    collection.createView(m);
+                collection.each(function(model) {
+                    collection.createView(model);
                 });
             });
 
             this.pages.reset(settings.pages);
 
             if (settings.start) {
-                Backbone.history.start({
-                    pushState: settings.pushState,
-                    root: settings.root
-                });
+                this.start();
             }
 
-            SPA.Router.__super__.initialize.call(this, options);
+            Viewport.Router.__super__.initialize.call(this, options);
         },
         /**
-         * Run `Backbone.history.start()` with options `pushState` and `root` provided in constructor.
+         * Run `Backbone.history.start()` with `pushState` and `root` provided in constructor and overridden by provided directly.
+         *
+         * @param {Object=} options
          */
-        start: function() {
-            Backbone.history.start({
-                pushState: this.pushState,
-                root: this.root
-            });
+        start: function(options) {
+            var defaults = {
+                    pushState: this.pushState,
+                    root: this.root,
+                    silent: this.silent
+                },
+                settings = _.extend({}, defaults, options);
+
+            Backbone.history.start(settings);
         },
         /**
          * Stop watching uri changes (Run `Backbone.history.stop()`).
          */
         stop: function() {
             Backbone.history.stop();
+        },
+        /**
+         * Returns current route depends on router type (pushState or hash)
+         *
+         * @returns {String}
+         */
+        getCurrentRoute: function() {
+            return (this.pushState) ? Backbone.history.getPath() : Backbone.history.getHash();
         },
         /**
          * Read document uri and activate page with given `attributes` (PlainObject).
@@ -233,7 +270,7 @@
          * @param {Object=} options
          */
         go: function(attributes, options) {
-            var uri = (this.pushState) ? Backbone.history.getPath() : Backbone.history.getHash(),
+            var uri = this.getCurrentRoute(),
                 modelAttributes = _.extend({uri: uri}, attributes),
                 collection = this.pages;
 
@@ -258,24 +295,32 @@
             }
 
             if (this.pages.has(modelAttributes.uri)) {
+                // Page is already in collection...
                 if (settings.force) {
+                    // ...but re-rendering is required although
                     if (settings.load) {
+                        // and loading is required too
                         var existed = this.pages.get(modelAttributes.uri);
 
                         fetchPage(existed, false);
                     } else {
+                        // merge attributes to existing page
                         this.pages.mergePage(modelAttributes, false);
                         openPage();
                     }
                 } else {
+                    // ...and just needs to be shown
                     openPage();
                 }
             } else {
+                // Page is not in collection
                 if (settings.load) {
+                    // and loading is required
                     var model = this.pages.addPage(modelAttributes, false);
 
                     fetchPage(model, true);
                 } else {
+                    // and just needs to merge attributes and to be shown
                     this.pages.addPage(modelAttributes, true);
                     openPage();
                 }
@@ -283,5 +328,5 @@
         }
     });
 
-    return SPA;
+    return Viewport;
 }));
